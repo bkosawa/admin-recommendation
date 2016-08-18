@@ -65,7 +65,7 @@ def extract_name(content):
     name = ''
     names = content.xpath('//div[@class="id-app-title"]')
     if names:
-        name = names[0].text_content()
+        name = names[0].text_content().strip()
     return name.encode('utf-8')
 
 
@@ -74,7 +74,7 @@ def extract_description(content):
     description = ''
     descriptions = content.xpath('//div[@itemprop="description"]')
     if descriptions:
-        description = descriptions[0].text_content()
+        description = descriptions[0].text_content().strip()
     return description.encode('utf-8')
 
 
@@ -87,7 +87,7 @@ def extract_update_date(content, loc):
     update_date = ''
     update_dates = content.xpath('//div[@itemprop="datePublished"]')
     if update_dates:
-        update_date_str = update_dates[0].text_content()
+        update_date_str = update_dates[0].text_content().strip()
         update_date = datetime.strptime(update_date_str, DATE_MASK[loc])
     return update_date
 
@@ -97,7 +97,7 @@ def extract_content_rating(content):
     content_rating = ''
     content_ratings = content.xpath('//div[@itemprop="contentRating"]')
     if content_ratings:
-        content_rating = content_ratings[0].text_content()
+        content_rating = content_ratings[0].text_content().strip()
     return content_rating
 
 
@@ -106,7 +106,7 @@ def extract_file_size(content):
     size = 0
     sizes = content.xpath('//div[@itemprop="fileSize"]')
     if sizes:
-        size = sizes[0].text_content()
+        size = sizes[0].text_content().strip()
     return size
 
 
@@ -115,7 +115,7 @@ def extract_version(content):
     version = 0
     versions = content.xpath('//div[@itemprop="softwareVersion"]')
     if versions:
-        version = versions[0].text_content()
+        version = versions[0].text_content().strip()
     return version
 
 
@@ -124,7 +124,7 @@ def extract_rating(content):
     rating = ''
     ratings = content.xpath('//div[@class="score"]')
     if ratings:
-        rating = ratings[0].text_content()
+        rating = ratings[0].text_content().strip()
     return rating
 
 
@@ -133,7 +133,7 @@ def extract_developer(content):
     developer = ''
     developers = content.xpath('//a[@class="document-subtitle primary"]/span[@itemprop="name"]')
     if developers:
-        developer = developers[0].text_content()
+        developer = developers[0].text_content().strip()
     return developer.encode('utf-8')
 
 
@@ -142,7 +142,7 @@ def extract_category_desc(content):
     category = ''
     categories = content.xpath('//span[@itemprop="genre"]')
     if categories:
-        category = categories[0].text_content()
+        category = categories[0].text_content().strip()
     return category.encode('utf-8')
 
 
@@ -152,7 +152,7 @@ def extract_category_key(content):
     category_urls = content.xpath('//a[@class="document-subtitle category"]/@href')
     if category_urls:
         category_url = category_urls[0]
-        category_key = category_url.split('/')[-1]
+        category_key = category_url.split('/')[-1].strip()
     return category_key.encode('utf-8')
 
 
