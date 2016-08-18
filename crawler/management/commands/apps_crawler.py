@@ -3,6 +3,7 @@ from datetime import datetime
 
 import requests
 from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from lxml import html
 
@@ -167,7 +168,7 @@ def get_details(app_package, loc):
         return
     except requests.exceptions.ConnectionError as e:
         print ('Connection Err\n' + str(e))
-        sys.exit(-1)
+        return
 
     content = html.fromstring(response.text)
 
@@ -266,8 +267,8 @@ class Command(BaseCommand):
                     total_count += 1
                     app_details_map = get_details(package, 'en')
                     if not app_details_map:
-                        print '{} Not Found'.format(package)
                         error_file.write(package+'\n')
+                        print '{} Not Found'.format(package)
                         continue
                     # print app_details_map
                     if app_details_map.get('similars'):
@@ -276,6 +277,11 @@ class Command(BaseCommand):
                     crawled_count += 1
                 except IOError as e:
                     print('Error on parsing')
+                    error_file.write(package + '\n')
+                    pass
+                except ValidationError as ve:
+                    error_file.write(package + '\n')
+                    print('Error on validation')
                     pass
 
             self.stdout.write(self.style.SUCCESS("{} app data collected from {}".format(crawled_count, total_count)))
