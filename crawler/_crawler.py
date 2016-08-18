@@ -4,7 +4,7 @@ from datetime import datetime
 import requests
 from lxml import html
 
-from _crawler.models import App, AppDescription, Category, CategoryDescription, Developer
+from crawler.models import App, AppDescription, Category, CategoryDescription, Developer
 
 DETAILS_URL = 'https://play.google.com/store/apps/details?id={}&hl={}'
 DATE_MASK = {'en': '%B %d, %Y', 'pt_BR': '%d de %B de %Y'}
