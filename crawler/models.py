@@ -113,3 +113,16 @@ class Developer(models.Model):
 
     # def __str__(self):
     #     return u'(id:' + str(self.id) + ', name:' + str(self.name) + ')'
+
+
+class GoogleSimilarApp(models.Model):
+    source_package = models.CharField(max_length=255)
+    similar_package = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'google_similar_app'
+        unique_together = (('source_package', 'similar_package'),)
+
+    def __unicode__(self):
+        return '{}, {}'.format(self.source_package, self.similar_package)
