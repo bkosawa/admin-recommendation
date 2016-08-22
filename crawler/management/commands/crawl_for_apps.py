@@ -1,3 +1,4 @@
+import csv
 import sys
 from datetime import datetime
 
@@ -258,7 +259,7 @@ class Command(BaseCommand):
             exit(1)
         now = datetime.now()
         with open('error-apps-id-list-{}.txt'.format(now), 'w') as error_file, \
-                open('similar-apps-{}.csv'.format(now), 'w') as similar_file:
+                open('similar-apps-{}.csv'.format(now), 'wb') as similar_file:
             crawled_count = 0
             total_count = 0
             for app_package in app_packages:
@@ -267,13 +268,15 @@ class Command(BaseCommand):
                     total_count += 1
                     app_details_map = get_details(package, 'en')
                     if not app_details_map:
-                        error_file.write(package+'\n')
+                        error_file.write(package + '\n')
                         print '{} Not Found'.format(package)
                         continue
                     # print app_details_map
                     if app_details_map.get('similars'):
                         for similar in app_details_map.get('similars'):
-                            similar_file.write('\"' + package + '\";\"' + similar + '\"\n')
+                            csv_writer = csv.writer(similar_file, delimiter=';', quotechar='"',
+                                                    quoting=csv.QUOTE_MINIMAL)
+                            csv_writer.writerow([package, similar])
                     crawled_count += 1
                 except IOError as e:
                     print('Error on parsing')
