@@ -10,3 +10,13 @@ class AppAdmin(admin.ModelAdmin):
 
     # def run_crawler(self):
     #     crawler.craw_for_app()
+
+
+@admin.register(models.GoogleSimilarApp)
+class GoogleSimilarAppAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.Developer)
+class DeveloperAdmin(admin.ModelAdmin):
+    pass
