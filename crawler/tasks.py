@@ -240,9 +240,9 @@ class Crawler:
                 'similars': similars,
                 }
 
-    def crawl(self, app_packages, now):
-        with open('error-apps-id-list-{}.txt'.format(now), 'w') as error_file, \
-                open('similar-apps-{}.csv'.format(now), 'wb') as similar_file:
+    def crawl(self, app_packages, date):
+        with open('error-apps-id-list-{}.txt'.format(date), 'w') as error_file, \
+                open('similar-apps-{}.csv'.format(date), 'wb') as similar_file:
             crawled_count = 0
             total_count = 0
             for app_package in app_packages:
