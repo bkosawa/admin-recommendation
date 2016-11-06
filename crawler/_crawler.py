@@ -146,40 +146,6 @@ def extract_category_key(content):
     # return category_key
 
 
-# def validate_app(app):
-#     a = db.query(App).filter_by(package_name=app.package_name).first()
-#     if a:
-#         found_app_desc = False
-#         for index, app_desc in enumerate(a.descriptions):
-#             if app_desc.loc == app.descriptions[0].loc:
-#                 app.descriptions[index] = app.descriptions[0]
-#                 found_app_desc = True
-#                 break
-#
-#         if not found_app_desc:
-#             a.descriptions.add(app.descriptions)
-#     c = db.query(Category).filter_by(key=app.categories[0].key).first()
-#     if c:
-#         found_cat_desc = False
-#         for index, cat_desc in enumerate(c.descriptions):
-#             if cat_desc.loc == app.categories[0].descriptions[0].loc:
-#                 c.descriptions[index] = app.categories[0].descriptions[0]
-#                 found_cat_desc = True
-#                 break
-#
-#         if not found_cat_desc:
-#             c.add(app.categories[0].descriptions[0])
-#
-#         app.categories[0] = c
-#     d = db.query(Developer).filter_by(name=app.developer.name).first()
-#     if d:
-#         app.developer_id = d.id
-#         app.developer = d
-#     if a:
-#         app = a
-#     return app
-
-
 def craw_for_app():
     try:
         with open('apps-id-list', 'r') as aid:
