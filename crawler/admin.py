@@ -1,6 +1,6 @@
 # Register your models here.
 from django.contrib import admin
-from crawler import models, form
+from crawler import models, forms
 
 
 class AppDescriptionAdminInline(admin.TabularInline):
@@ -21,7 +21,7 @@ class CategoryAdminInline(admin.TabularInline):
 @admin.register(models.App)
 class AppAdmin(admin.ModelAdmin):
     list_display = ('name', 'package_name', 'version', 'developer')
-    form = form.AppForm
+    form = forms.AppForm
     inlines = [AppDescriptionAdminInline, CategoryAdminInline]
 
     # actions = ['run_crawler']
