@@ -135,6 +135,15 @@ class Developer(models.Model):
     def __unicode__(self):
         return self.name
 
+    @staticmethod
+    def get_developer_list(start):
+        developer_list = dict()
+        devs = Developer.objects.all()
+        for dev in devs:
+            developer_list[dev.name] = start
+            start += 1
+        return developer_list
+
     # def __str__(self):
     #     return u'(id:' + str(self.id) + ', name:' + str(self.name) + ')'
 
