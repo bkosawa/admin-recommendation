@@ -1,10 +1,13 @@
 import csv
 from datetime import datetime
 
+import numpy as np
 import requests
-from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory
 from django.core.exceptions import ValidationError
 from lxml import html
+from scipy.sparse import dok_matrix
+
+from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory
 
 DETAILS_URL = 'http://play.google.com/store/apps/details?id={}&hl={}'
 DATE_MASK = {'en': '%B %d, %Y', 'pt_BR': '%d de %B de %Y'}
@@ -279,3 +282,25 @@ class AppClassifier:
     def __init__(self):
         self.category_keys = Category.get_category_list(0)
         self.developer_list = Developer.get_developer_list(len(self.category_keys))
+
+    def create_utility_matrix(self, apps):
+        app_count = len(apps)
+        cat_count = len(self.category_keys)
+        dev_count = len(self.developer_list)
+        total_col = cat_count + dev_count
+        mat_row = 0
+
+        utility_matrix = dok_matrix((app_count, total_col), dtype=np.int)
+        for app in apps:
+            cat_key = app.category_key()
+            dev_name = app.developer_name()
+
+            mat_col1 = self.category_keys[cat_key]
+            mat_col2 = self.developer_list[dev_name]
+
+            utility_matrix[mat_row, mat_col1] = 1
+            utility_matrix[mat_row, mat_col2] = 1
+
+            mat_row += 1
+
+        return utility_matrix
