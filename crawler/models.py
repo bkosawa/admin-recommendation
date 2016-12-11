@@ -30,8 +30,17 @@ class App(models.Model):
     def name(self):
         description = self.appdescription_set.filter(locale='en').all()
         if description:
-            return description[0].name
-        return ''
+            return u'{}'.format(description[0].name)
+        return u''
+
+    def category_key(self):
+        category = self.appcategory_set.first().category
+        if category:
+            return u'{}'.format(category.key)
+        return u''
+
+    def developer_name(self):
+        return self.developer.name
 
     # def __str__(self):
     #     return u'(id=' + str(self.id) + \
