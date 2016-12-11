@@ -94,6 +94,15 @@ class Category(models.Model):
     def __unicode__(self):
         return self.key
 
+    @staticmethod
+    def get_category_list(start):
+        category_keys = dict()
+        categories = Category.objects.all().order_by('key')
+        for category in categories:
+            category_keys[category.key] = start
+            start += 1
+        return category_keys
+
     # def __str__(self):
     #     return u'(id:' + str(self.id) + ', key:' + str(self.key) + ')'
 
