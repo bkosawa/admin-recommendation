@@ -270,3 +270,12 @@ class Crawler:
                     pass
 
             return crawled_count, total_count
+
+
+class AppClassifier:
+    category_keys = dict()
+    developer_list = dict()
+
+    def __init__(self):
+        self.category_keys = Category.get_category_list(0)
+        self.developer_list = Developer.get_developer_list(len(self.category_keys))
