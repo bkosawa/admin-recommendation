@@ -276,22 +276,24 @@ class Crawler:
 
 
 class AppClassifier:
+    apps_list = []
     category_keys = dict()
     developer_list = dict()
 
-    def __init__(self):
-        self.category_keys = Category.get_category_list(0)
-        self.developer_list = Developer.get_developer_list(len(self.category_keys))
+    def __init__(self, apps, categories, developers):
+        self.apps_list = apps
+        self.category_keys = categories
+        self.developer_list = developers
 
-    def create_utility_matrix(self, apps):
-        app_count = len(apps)
+    def create_utility_matrix(self):
+        app_count = len(self.apps_list)
         cat_count = len(self.category_keys)
         dev_count = len(self.developer_list)
         total_col = cat_count + dev_count
         mat_row = 0
 
         utility_matrix = dok_matrix((app_count, total_col), dtype=np.int)
-        for app in apps:
+        for app in self.apps_list:
             cat_key = app.category_key()
             dev_name = app.developer_name()
 
