@@ -95,13 +95,8 @@ class Category(models.Model):
         return self.key
 
     @staticmethod
-    def get_category_list(start):
-        category_keys = dict()
-        categories = Category.objects.all().order_by('key')
-        for category in categories:
-            category_keys[category.key] = start
-            start += 1
-        return category_keys
+    def get_all_categories():
+        return Category.objects.all().order_by('key')
 
     # def __str__(self):
     #     return u'(id:' + str(self.id) + ', key:' + str(self.key) + ')'
@@ -136,13 +131,8 @@ class Developer(models.Model):
         return self.name
 
     @staticmethod
-    def get_developer_list(start):
-        developer_list = dict()
-        devs = Developer.objects.all()
-        for dev in devs:
-            developer_list[dev.name] = start
-            start += 1
-        return developer_list
+    def get_developer_list():
+        return Developer.objects.all()
 
     # def __str__(self):
     #     return u'(id:' + str(self.id) + ', name:' + str(self.name) + ')'
