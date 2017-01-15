@@ -21,14 +21,10 @@ class Command(BaseCommand):
         else:
             apps = App.objects.all()[:apps_count]
         classifier = AppClassifier(apps, category_keys, developer_list)
-        matrix = classifier.create_utility_matrix()
+        similar_apps = classifier.find_similar_apps()
 
-        for i in range(0, apps_count - 1):
-            for j in range(i + 1, apps_count):
-                row = matrix.getrow(i)
-                other_row = matrix.getrow(j)
-                if classifier.is_similar(row, other_row):
-                    print '{} and {} are similar'.format(apps[i].name(), apps[j].name())
+        for app_tuple in similar_apps:
+            print '{} and {} are similar'.format(app_tuple[0].name(), app_tuple[1].name())
 
     @staticmethod
     def get_category_dict(category_list, start=0):
