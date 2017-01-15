@@ -32,6 +32,9 @@ class Command(BaseCommand):
         for category in category_list:
             category_keys[category.key] = start
             start += 1
+
+        category_keys['GAME'] = start
+        start += 1
         return category_keys
 
     @staticmethod
