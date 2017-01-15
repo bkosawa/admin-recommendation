@@ -11,6 +11,10 @@ def get_expected_matrix(app_count, total_col):
     matrix = dok_matrix((app_count, total_col), dtype=np.int)
     matrix[0, 0] = 1
     matrix[0, 2] = 1
+    matrix[1, 0] = 1
+    matrix[1, 3] = 1
+    matrix[2, 1] = 1
+    matrix[2, 4] = 1
     return matrix
 
 
@@ -25,14 +29,24 @@ def get_developers():
     developers = dict()
     developers['EA'] = 2
     developers['CAPCOM'] = 3
+    developers['TOCA BOCA'] = 4
     return developers
 
 
 def get_mocked_apps():
-    app = App()
-    app.category_key = MagicMock(return_value='GAMES')
-    app.developer_name = MagicMock(return_value='EA')
-    apps = [app]
+    app1 = App()
+    app1.category_key = MagicMock(return_value='GAMES')
+    app1.developer_name = MagicMock(return_value='EA')
+
+    app2 = App()
+    app2.category_key = MagicMock(return_value='GAMES')
+    app2.developer_name = MagicMock(return_value='CAPCOM')
+
+    app3 = App()
+    app3.category_key = MagicMock(return_value='EDUCATIONAL')
+    app3.developer_name = MagicMock(return_value='TOCA BOCA')
+
+    apps = [app1, app2, app3]
     return apps
 
 
