@@ -294,15 +294,21 @@ class AppClassifier:
 
         utility_matrix = dok_matrix((app_count, total_col), dtype=np.int)
         for mat_row, app in enumerate(self.apps_list):
-            cat_key = app.category_key()
-            mat_col1 = self.category_keys[cat_key]
-            utility_matrix[mat_row, mat_col1] = 1
+            self.evaluate_category(app, mat_row, utility_matrix)
 
-            dev_name = app.developer_name()
-            mat_col2 = self.developer_list[dev_name]
-            utility_matrix[mat_row, mat_col2] = 1
+            self.evaluate_developer(app, mat_row, utility_matrix)
 
         return utility_matrix
+
+    def evaluate_developer(self, app, mat_row, utility_matrix):
+        dev_name = app.developer_name()
+        mat_col2 = self.developer_list[dev_name]
+        utility_matrix[mat_row, mat_col2] = 1
+
+    def evaluate_category(self, app, mat_row, utility_matrix):
+        cat_key = app.category_key()
+        mat_col1 = self.category_keys[cat_key]
+        utility_matrix[mat_row, mat_col1] = 1
 
     def is_similar(self, u, v, similarity_boundary=0.6):
         cos_dist = pairwise_distances(u, v, 'cosine')
