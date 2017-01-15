@@ -6,6 +6,7 @@ import requests
 from django.core.exceptions import ValidationError
 from lxml import html
 from scipy.sparse import dok_matrix
+from sklearn.metrics import pairwise_distances
 
 from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory
 
@@ -306,3 +307,7 @@ class AppClassifier:
             mat_row += 1
 
         return utility_matrix
+
+    def is_similar(self, u, v, similarity_boundary=0.6):
+        cos_dist = pairwise_distances(u, v, 'cosine')
+        return cos_dist < similarity_boundary

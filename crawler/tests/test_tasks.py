@@ -1,5 +1,5 @@
 import numpy as np
-from django.test import TestCase
+from django.test import SimpleTestCase
 from mock import MagicMock
 from scipy.sparse import dok_matrix
 
@@ -36,16 +36,54 @@ def get_mocked_apps():
     return apps
 
 
-class AppClassifierTest(TestCase):
+class AppClassifierTest(SimpleTestCase):
+    def setUp(self):
+        self.categories = get_categories()
+        self.developers = get_developers()
+        self.apps = get_mocked_apps()
+        self.classifier = AppClassifier(self.apps, self.categories, self.developers)
+
     def test_create_matrix(self):
-        categories = get_categories()
-        developers = get_developers()
-        apps = get_mocked_apps()
-        rows = len(apps)
-        cols = len(categories.keys()) + len(developers.keys())
+        rows = len(self.apps)
+        cols = len(self.categories.keys()) + len(self.developers.keys())
         expected_matrix = get_expected_matrix(rows, cols)
 
-        classifier = AppClassifier(apps, categories, developers)
-        matrix = classifier.create_utility_matrix()
+        matrix = self.classifier.create_utility_matrix()
 
         self.assertTrue((matrix - expected_matrix).nnz == 0)
+
+    def test_is_similar_with_two_non_zeros_and_the_same_array(self):
+        u = dok_matrix((1, 10), dtype=np.int)
+        v = dok_matrix((1, 10), dtype=np.int)
+
+        u[0, 7] = 1
+        u[0, 9] = 1
+
+        v[0, 7] = 1
+        v[0, 9] = 1
+
+        self.assertTrue(self.classifier.is_similar(u, v, 0.6))
+
+    def test_is_similar_with_two_non_zeros_and_one_equals(self):
+        u = dok_matrix((1, 10), dtype=np.int)
+        v = dok_matrix((1, 10), dtype=np.int)
+
+        u[0, 7] = 1
+        u[0, 9] = 1
+
+        v[0, 2] = 1
+        v[0, 9] = 1
+
+        self.assertTrue(self.classifier.is_similar(u, v, 0.6))
+
+    def test_is_similar_with_two_non_zeros_and_none_equals(self):
+        u = dok_matrix((1, 10), dtype=np.int)
+        v = dok_matrix((1, 10), dtype=np.int)
+
+        u[0, 7] = 1
+        u[0, 9] = 1
+
+        v[0, 2] = 1
+        v[0, 6] = 1
+
+        self.assertFalse(self.classifier.is_similar(u, v, 0.6))
