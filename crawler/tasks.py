@@ -281,10 +281,11 @@ class AppClassifier:
     category_keys = dict()
     developer_list = dict()
 
-    def __init__(self, apps, categories, developers):
+    def __init__(self, apps, categories, developers, boundary=0.6):
         self.apps_list = apps
         self.category_keys = categories
         self.developer_list = developers
+        self.similarity_boundary = boundary
 
     def create_utility_matrix(self):
         app_count = len(self.apps_list)
@@ -307,8 +308,13 @@ class AppClassifier:
 
     def evaluate_category(self, app, mat_row, utility_matrix):
         cat_key = app.category_key()
-        mat_col1 = self.category_keys[cat_key]
-        utility_matrix[mat_row, mat_col1] = 1
+
+        if cat_key.startswith('GAME') and 'GAME' in self.category_keys:
+            game_col = self.category_keys['GAME']
+            utility_matrix[mat_row, game_col] = 1
+
+        cat_col = self.category_keys[cat_key]
+        utility_matrix[mat_row, cat_col] = 1
 
     def is_similar(self, u, v, similarity_boundary=0.6):
         cos_dist = pairwise_distances(u, v, 'cosine')
@@ -324,7 +330,8 @@ class AppClassifier:
             for j in range(i + 1, apps_count):
                 row = matrix.getrow(i)
                 other_row = matrix.getrow(j)
-                if self.is_similar(row, other_row):
+                if self.is_similar(row, other_row, self.similarity_boundary):
                     similar_apps.append((self.apps_list[i], self.apps_list[j]))
+                    # print '{} and {} are similar'.format(self.apps_list[i].name(), self.apps_list[j].name())
 
         return similar_apps

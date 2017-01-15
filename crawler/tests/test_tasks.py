@@ -10,43 +10,57 @@ from crawler.tasks import AppClassifier
 def get_expected_matrix(app_count, total_col):
     matrix = dok_matrix((app_count, total_col), dtype=np.int)
     matrix[0, 0] = 1
-    matrix[0, 2] = 1
+    matrix[0, 4] = 1
+    matrix[0, 3] = 1
+
     matrix[1, 0] = 1
+    matrix[1, 5] = 1
     matrix[1, 3] = 1
+
     matrix[2, 1] = 1
-    matrix[2, 4] = 1
+    matrix[2, 6] = 1
+
+    matrix[3, 2] = 1
+    matrix[3, 4] = 1
+    matrix[3, 3] = 1
     return matrix
 
 
 def get_categories():
     categories = dict()
-    categories['GAMES'] = 0
+    categories['GAME_ADVENTURE'] = 0
     categories['EDUCATIONAL'] = 1
+    categories['GAME_EDUCATIONAL'] = 2
+    categories['GAME'] = 3
     return categories
 
 
 def get_developers():
     developers = dict()
-    developers['EA'] = 2
-    developers['CAPCOM'] = 3
-    developers['TOCA BOCA'] = 4
+    developers['EA'] = 4
+    developers['CAPCOM'] = 5
+    developers['TOCA BOCA'] = 6
     return developers
 
 
 def get_mocked_apps():
     app1 = App()
-    app1.category_key = MagicMock(return_value='GAMES')
+    app1.category_key = MagicMock(return_value='GAME_ADVENTURE')
     app1.developer_name = MagicMock(return_value='EA')
 
     app2 = App()
-    app2.category_key = MagicMock(return_value='GAMES')
+    app2.category_key = MagicMock(return_value='GAME_ADVENTURE')
     app2.developer_name = MagicMock(return_value='CAPCOM')
 
     app3 = App()
     app3.category_key = MagicMock(return_value='EDUCATIONAL')
     app3.developer_name = MagicMock(return_value='TOCA BOCA')
 
-    apps = [app1, app2, app3]
+    app4 = App()
+    app4.category_key = MagicMock(return_value='GAME_EDUCATIONAL')
+    app4.developer_name = MagicMock(return_value='EA')
+
+    apps = [app1, app2, app3, app4]
     return apps
 
 
@@ -103,7 +117,7 @@ class AppClassifierTest(SimpleTestCase):
         self.assertFalse(self.classifier.is_similar(u, v, 0.6))
 
     def test_find_similar_apps(self):
-        expected_similar_apps = [(self.apps[0], self.apps[1])]
+        expected_similar_apps = [(self.apps[0], self.apps[1]), (self.apps[0], self.apps[3])]
         similar_apps = self.classifier.find_similar_apps()
 
         self.assertEqual(similar_apps, expected_similar_apps)
