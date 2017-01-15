@@ -103,7 +103,7 @@ class AppClassifierTest(SimpleTestCase):
         self.assertFalse(self.classifier.is_similar(u, v, 0.6))
 
     def test_find_similar_apps(self):
-        expected_similar_apps = []
+        expected_similar_apps = [(self.apps[0], self.apps[1])]
         similar_apps = self.classifier.find_similar_apps()
 
         self.assertEqual(similar_apps, expected_similar_apps)
