@@ -313,3 +313,6 @@ class AppClassifier:
     def is_similar(self, u, v, similarity_boundary=0.6):
         cos_dist = pairwise_distances(u, v, 'cosine')
         return cos_dist < similarity_boundary
+
+    def find_similar_apps(self):
+        return []
