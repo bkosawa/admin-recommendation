@@ -320,9 +320,9 @@ class AppClassifier:
         cat_col = self.features['category'][cat_key]
         utility_matrix[mat_row, cat_col] = 1
 
-    def is_similar(self, u, v, similarity_boundary=0.6):
+    def is_similar(self, u, v):
         cos_dist = pairwise_distances(u, v, 'cosine')
-        return cos_dist < similarity_boundary
+        return cos_dist < self.similarity_boundary
 
     def find_similar_apps(self):
         similar_apps = []
@@ -334,7 +334,7 @@ class AppClassifier:
             for j in range(i + 1, apps_count):
                 row = matrix.getrow(i)
                 other_row = matrix.getrow(j)
-                if self.is_similar(row, other_row, self.similarity_boundary):
+                if self.is_similar(row, other_row):
                     similar_apps.append((self.apps_list[i], self.apps_list[j]))
                     # print '{} and {} are similar'.format(self.apps_list[i].name(), self.apps_list[j].name())
 

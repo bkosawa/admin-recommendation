@@ -6,6 +6,8 @@ from scipy.sparse import dok_matrix
 from crawler.models import App
 from crawler.tasks import AppClassifier, get_features_total_count
 
+TEST_SIMILARITY_BOUNDARY = 0.6
+
 
 def get_expected_matrix(app_count, total_col):
     matrix = dok_matrix((app_count, total_col), dtype=np.int)
@@ -96,7 +98,8 @@ class AppClassifierTest(SimpleTestCase):
         v[0, 7] = 1
         v[0, 9] = 1
 
-        self.assertTrue(self.classifier.is_similar(u, v, 0.6))
+        self.classifier.similarity_boundary = 0.6
+        self.assertTrue(self.classifier.is_similar(u, v))
 
     def test_is_similar_with_two_non_zeros_and_one_equals(self):
         u = dok_matrix((1, 10), dtype=np.int)
@@ -108,7 +111,8 @@ class AppClassifierTest(SimpleTestCase):
         v[0, 2] = 1
         v[0, 9] = 1
 
-        self.assertTrue(self.classifier.is_similar(u, v, 0.6))
+        self.classifier.similarity_boundary = 0.6
+        self.assertTrue(self.classifier.is_similar(u, v))
 
     def test_is_similar_with_two_non_zeros_and_none_equals(self):
         u = dok_matrix((1, 10), dtype=np.int)
@@ -120,7 +124,8 @@ class AppClassifierTest(SimpleTestCase):
         v[0, 2] = 1
         v[0, 6] = 1
 
-        self.assertFalse(self.classifier.is_similar(u, v, 0.6))
+        self.classifier.similarity_boundary = TEST_SIMILARITY_BOUNDARY
+        self.assertFalse(self.classifier.is_similar(u, v))
 
     def test_find_similar_apps(self):
         expected_similar_apps = [(self.apps[0], self.apps[1]), (self.apps[0], self.apps[3])]
