@@ -33,6 +33,9 @@ class App(models.Model):
             return u'{}'.format(description[0].name)
         return u''
 
+    def category(self):
+        return self.appcategory_set.first().category
+
     def category_key(self):
         category = self.appcategory_set.first().category
         if category:
