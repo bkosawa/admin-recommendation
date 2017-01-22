@@ -276,22 +276,26 @@ class Crawler:
             return crawled_count, total_count
 
 
+def get_features_total_count(features):
+    count = 0
+    for feature_key in features.keys():
+        count += len(features[feature_key])
+    return count
+
+
 class AppClassifier:
     apps_list = []
-    category_keys = dict()
-    developer_list = dict()
+    features = dict()
 
-    def __init__(self, apps, categories, developers, boundary=0.6):
+    def __init__(self, apps, features=None, boundary=0.6):
         self.apps_list = apps
-        self.category_keys = categories
-        self.developer_list = developers
+        if features:
+            self.features = features
         self.similarity_boundary = boundary
 
     def create_utility_matrix(self):
         app_count = len(self.apps_list)
-        cat_count = len(self.category_keys)
-        dev_count = len(self.developer_list)
-        total_col = cat_count + dev_count
+        total_col = get_features_total_count(self.features)
 
         utility_matrix = dok_matrix((app_count, total_col), dtype=np.int)
         for mat_row, app in enumerate(self.apps_list):
@@ -303,17 +307,17 @@ class AppClassifier:
 
     def evaluate_developer(self, app, mat_row, utility_matrix):
         dev_name = app.developer_name()
-        mat_col2 = self.developer_list[dev_name]
+        mat_col2 = self.features['developer'][dev_name]
         utility_matrix[mat_row, mat_col2] = 1
 
     def evaluate_category(self, app, mat_row, utility_matrix):
         cat_key = app.category_key()
 
-        if cat_key.startswith('GAME') and 'GAME' in self.category_keys:
-            game_col = self.category_keys['GAME']
+        if cat_key.startswith('GAME') and 'GAME' in self.features['category']:
+            game_col = self.features['category']['GAME']
             utility_matrix[mat_row, game_col] = 1
 
-        cat_col = self.category_keys[cat_key]
+        cat_col = self.features['category'][cat_key]
         utility_matrix[mat_row, cat_col] = 1
 
     def is_similar(self, u, v, similarity_boundary=0.6):

@@ -4,7 +4,7 @@ from mock import MagicMock
 from scipy.sparse import dok_matrix
 
 from crawler.models import App
-from crawler.tasks import AppClassifier
+from crawler.tasks import AppClassifier, get_features_total_count
 
 
 def get_expected_matrix(app_count, total_col):
@@ -43,6 +43,13 @@ def get_developers():
     return developers
 
 
+def get_features():
+    features = dict()
+    features['category'] = get_categories()
+    features['developer'] = get_developers()
+    return features
+
+
 def get_mocked_apps():
     app1 = App()
     app1.category_key = MagicMock(return_value='GAME_ADVENTURE')
@@ -66,14 +73,13 @@ def get_mocked_apps():
 
 class AppClassifierTest(SimpleTestCase):
     def setUp(self):
-        self.categories = get_categories()
-        self.developers = get_developers()
         self.apps = get_mocked_apps()
-        self.classifier = AppClassifier(self.apps, self.categories, self.developers)
+        self.features = get_features()
+        self.classifier = AppClassifier(self.apps, self.features)
 
     def test_create_matrix(self):
         rows = len(self.apps)
-        cols = len(self.categories.keys()) + len(self.developers.keys())
+        cols = get_features_total_count(self.features)
         expected_matrix = get_expected_matrix(rows, cols)
 
         matrix = self.classifier.create_utility_matrix()
