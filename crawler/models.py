@@ -155,4 +155,4 @@ class GoogleSimilarApp(models.Model):
 
 
 def convert_from_sparse_array(sparse_array):
-    pass
+    return ''
