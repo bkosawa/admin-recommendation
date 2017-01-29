@@ -40,6 +40,11 @@ class UtilityMatrixTest(SimpleTestCase):
         serialized_array = convert_from_sparse_array(sparse_array)
         self.assertEqual(serialized_array, expected_serialized_array)
 
+    def test_utility_matrix_empty_string_to_sparse_matrix(self):
+        serialized_dict = ''
+        matrix = convert_from_dict_string(serialized_dict)
+        self.assertTrue(matrix.nnz == 0)
+
     def test_utility_matrix_empty_dict_to_sparse_matrix(self):
         serialized_dict = '{}'
         matrix = convert_from_dict_string(serialized_dict)
