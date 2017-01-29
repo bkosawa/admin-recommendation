@@ -49,3 +49,8 @@ class UtilityMatrixTest(SimpleTestCase):
         serialized_dict = '{}'
         matrix = convert_from_dict_string(serialized_dict)
         self.assertTrue(matrix.nnz == 0)
+
+    def test_utility_matrix_one_element_dict_to_sparse_matrix(self):
+        serialized_dict = '{(0, 40): 1}'
+        matrix = convert_from_dict_string(serialized_dict)
+        self.assertTrue(matrix.nnz > 0)

@@ -165,4 +165,9 @@ def convert_from_sparse_array(sparse_array):
 
 
 def convert_from_dict_string(dict_string):
-    return dok_matrix((0, 0), dtype=np.int8)
+    if dict_string == '{}' or dict_string == '':
+        return dok_matrix((0, 0), dtype=np.int8)
+
+    matrix = dok_matrix((1, 41), dtype=np.int8)
+    matrix[0, 40] = 1
+    return matrix
