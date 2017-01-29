@@ -16,3 +16,10 @@ class UtilityMatrixTest(SimpleTestCase):
         sparse_array = dok_matrix((1, 100), dtype=np.int8)
         serialized_array = convert_from_sparse_array(sparse_array)
         self.assertEqual(serialized_array, expected_serialized_array)
+
+    def test_utility_matrix_one_element_array_return_an_dict_as_string(self):
+        expected_serialized_array = '{"40":1}'
+        sparse_array = dok_matrix((1, 100), dtype=np.int8)
+        sparse_array[0, 40] = 1
+        serialized_array = convert_from_sparse_array(sparse_array)
+        self.assertEqual(serialized_array, expected_serialized_array)
