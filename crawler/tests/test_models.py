@@ -2,7 +2,7 @@ import numpy as np
 from django.test.testcases import SimpleTestCase
 from scipy.sparse import dok_matrix
 
-from crawler.models import convert_from_sparse_array
+from crawler.models import convert_from_sparse_array, convert_from_dict_string
 
 
 class UtilityMatrixTest(SimpleTestCase):
@@ -39,3 +39,8 @@ class UtilityMatrixTest(SimpleTestCase):
         sparse_array[1, 80] = 1
         serialized_array = convert_from_sparse_array(sparse_array)
         self.assertEqual(serialized_array, expected_serialized_array)
+
+    def test_utility_matrix_empty_dict_to_sparse_matrix(self):
+        serialized_dict = '{}'
+        matrix = convert_from_dict_string(serialized_dict)
+        self.assertTrue(matrix.nnz == 0)

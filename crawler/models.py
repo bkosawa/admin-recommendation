@@ -7,7 +7,9 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from __future__ import unicode_literals
 
+import numpy as np
 from django.db import models
+from scipy.sparse import dok_matrix
 
 
 class App(models.Model):
@@ -160,3 +162,7 @@ def convert_from_sparse_array(sparse_array):
     for row, col in zip(rows, cols):
         array_dict[(row, col)] = sparse_array[row, col]
     return str(array_dict)
+
+
+def convert_from_dict_string(dict_string):
+    return dok_matrix((0, 0), dtype=np.int8)
