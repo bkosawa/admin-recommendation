@@ -157,5 +157,10 @@ class GoogleSimilarApp(models.Model):
 def convert_from_sparse_array(sparse_array):
     if sparse_array.nnz == 0:
         return ''
-
-    return '{"40":1}'
+    rows, cols = sparse_array.nonzero()
+    array_dict = dict()
+    for row, col in zip(rows, cols):
+        array_dict[col] = sparse_array[row, col]
+    #     print str(((row, col), sparse_array[row, col]))
+    print str(array_dict)
+    return str(array_dict)
