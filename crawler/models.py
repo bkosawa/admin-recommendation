@@ -152,3 +152,7 @@ class GoogleSimilarApp(models.Model):
 
     def __unicode__(self):
         return '{}, {}'.format(self.source_package, self.similar_package)
+
+
+def convert_from_sparse_array(sparse_array):
+    pass
