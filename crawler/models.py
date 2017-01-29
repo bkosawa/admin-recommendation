@@ -155,8 +155,6 @@ class GoogleSimilarApp(models.Model):
 
 
 def convert_from_sparse_array(sparse_array):
-    if sparse_array.nnz == 0:
-        return ''
     rows, cols = sparse_array.nonzero()
     array_dict = dict()
     for row, col in zip(rows, cols):
