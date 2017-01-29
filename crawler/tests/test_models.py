@@ -18,16 +18,24 @@ class UtilityMatrixTest(SimpleTestCase):
         self.assertEqual(serialized_array, expected_serialized_array)
 
     def test_utility_matrix_one_element_array_return_an_dict_as_string(self):
-        expected_serialized_array = '{40: 1}'
+        expected_serialized_array = '{(0, 40): 1}'
         sparse_array = dok_matrix((1, 100), dtype=np.int8)
         sparse_array[0, 40] = 1
         serialized_array = convert_from_sparse_array(sparse_array)
         self.assertEqual(serialized_array, expected_serialized_array)
 
     def test_utility_matrix_two_elements_array_return_an_dict_as_string(self):
-        expected_serialized_array = '{80: 1, 40: 1}'
+        expected_serialized_array = '{(0, 40): 1, (0, 80): 1}'
         sparse_array = dok_matrix((1, 100), dtype=np.int8)
         sparse_array[0, 40] = 1
         sparse_array[0, 80] = 1
+        serialized_array = convert_from_sparse_array(sparse_array)
+        self.assertEqual(serialized_array, expected_serialized_array)
+
+    def test_utility_matrix_two_elements_matrix_two_by_one_hundred_return_an_dict_as_string(self):
+        expected_serialized_array = '{(1, 80): 1, (0, 40): 1}'
+        sparse_array = dok_matrix((2, 100), dtype=np.int8)
+        sparse_array[0, 40] = 1
+        sparse_array[1, 80] = 1
         serialized_array = convert_from_sparse_array(sparse_array)
         self.assertEqual(serialized_array, expected_serialized_array)

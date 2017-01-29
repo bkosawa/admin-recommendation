@@ -158,5 +158,5 @@ def convert_from_sparse_array(sparse_array):
     rows, cols = sparse_array.nonzero()
     array_dict = dict()
     for row, col in zip(rows, cols):
-        array_dict[col] = sparse_array[row, col]
+        array_dict[(row, col)] = sparse_array[row, col]
     return str(array_dict)
