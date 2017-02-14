@@ -7,6 +7,6 @@ from crawler.serializers import AppSerializer
 
 class AppList(APIView):
     def get(self, request, format=None):
-        users = App.objects.all()[:25]
+        users = App.objects.all()
         serializer = AppSerializer(users, many=True)
         return Response(serializer.data)
