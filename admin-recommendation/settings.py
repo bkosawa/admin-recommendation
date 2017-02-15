@@ -17,7 +17,6 @@ from os.path import normpath, join
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
@@ -28,7 +27,6 @@ SECRET_KEY = 'g^dpyw$mvbv5(c&k-$oz#b5a1a)t*q6va^bvkkz+9-$i6jakaq'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -49,7 +47,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAdminUser',
     ],
-    'PAGE_SIZE': 10
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 25
 }
 
 MIDDLEWARE_CLASSES = [
@@ -87,22 +86,22 @@ WSGI_APPLICATION = 'admin-recommendation.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
- 'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'admin',
         'USER': os.environ.get('RECOM_DATA_USER', 'recom_server'),
         'PASSWORD': os.environ.get('RECOM_DATA_PASSWORD', 'password@2016'),
         'HOST': os.environ.get('RECOM_DATA_URL', '127.0.0.1'),
         'PORT': '3306',
- },
- 'app-recommendation': {
-         'ENGINE': 'django.db.backends.mysql',
-         'NAME': 'recommendation',
-         'USER': os.environ.get('RECOM_DATA_USER', 'recom_server'),
-         'PASSWORD': os.environ.get('RECOM_DATA_PASSWORD', 'password@2016'),
-         'HOST': os.environ.get('RECOM_DATA_URL', '127.0.0.1'),
-         'PORT': '3306',
-     }
+    },
+    'app-recommendation': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'recommendation',
+        'USER': os.environ.get('RECOM_DATA_USER', 'recom_server'),
+        'PASSWORD': os.environ.get('RECOM_DATA_PASSWORD', 'password@2016'),
+        'HOST': os.environ.get('RECOM_DATA_URL', '127.0.0.1'),
+        'PORT': '3306',
+    }
 }
 
 DATABASE_ROUTERS = ['my_router.MyRouter']
@@ -125,7 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
@@ -138,7 +136,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
