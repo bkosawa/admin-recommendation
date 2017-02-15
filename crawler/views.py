@@ -1,12 +1,10 @@
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import viewsets
 
 from crawler.models import App
 from crawler.serializers import AppSerializer
 
 
-class AppList(APIView):
-    def get(self, request, format=None):
-        users = App.objects.all()
-        serializer = AppSerializer(users, many=True)
-        return Response(serializer.data)
+class AppViewSet(viewsets.ModelViewSet):
+    queryset = App.objects.all()
+    serializer_class = AppSerializer
+    http_method_names = ['get', 'options']
