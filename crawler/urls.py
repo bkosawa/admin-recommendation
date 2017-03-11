@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -8,7 +8,7 @@ router = routers.DefaultRouter()
 router.register(r'apps', views.AppViewSet)
 router.register(r'recommended-apps', views.RecommendedAppViewSet)
 
-urlpatterns = patterns('',
-                       url(r'^', include(router.urls)),
-                       url(r'^api-token-auth/', obtain_auth_token)
-                       )
+urlpatterns = [
+    url(r'^', include(router.urls)),
+    url(r'^api-token-auth/', obtain_auth_token)
+]
