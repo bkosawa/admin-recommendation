@@ -6,6 +6,7 @@ from crawler import views
 
 router = routers.DefaultRouter()
 router.register(r'apps', views.AppViewSet)
+router.register(r'recommended-apps', views.RecommendedAppViewSet)
 
 urlpatterns = patterns('',
                        url(r'^', include(router.urls)),
