@@ -20,6 +20,9 @@ class User(models.Model):
         managed = False
         db_table = 'user'
 
+    def __unicode__(self):
+        return u'{} {}'.format(self.name, self.email)
+
 
 class App(models.Model):
     package_name = models.CharField(unique=True, max_length=255)
