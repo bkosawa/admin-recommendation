@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from crawler.models import App, User
-from crawler.serializers import AppSerializer, PackageNameSerialize
+from crawler.serializers import AppSerializer, UserAppsSerializer
 
 
 class AppViewSet(viewsets.ModelViewSet):
@@ -36,7 +36,7 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
             recommendation_user.email = user.email
             recommendation_user.save()
 
-        serializer = PackageNameSerialize(data=request.data, many=True)
+        serializer = UserAppsSerializer(data=request.data, many=True)
         if serializer.is_valid():
             valid_data = serializer.validated_data
             headers = self.get_success_headers(serializer.data)
