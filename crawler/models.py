@@ -12,6 +12,15 @@ from django.db import models
 from scipy.sparse import dok_matrix
 
 
+class User(models.Model):
+    name = models.CharField(max_length=60)
+    email = models.EmailField(unique=True)
+
+    class Meta:
+        managed = False
+        db_table = 'user'
+
+
 class App(models.Model):
     package_name = models.CharField(unique=True, max_length=255)
     icon_url = models.CharField(max_length=200, blank=True, null=True)
