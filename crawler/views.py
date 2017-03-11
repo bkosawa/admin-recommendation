@@ -18,9 +18,11 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'options']
 
     def list(self, request, *args, **kwargs):
-        # To be used to identify recommendation
         user = request.user
-        print user
+        recommendation_user = User.objects.filter(email=user.email)
+        if not recommendation_user:
+            return Response(data={'status': 404}, status=status.HTTP_404_NOT_FOUND)
+
         queryset = App.objects.all()
         serializer = AppSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
