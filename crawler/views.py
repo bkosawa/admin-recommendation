@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from crawler.models import App
+from crawler.models import App, User
 from crawler.serializers import AppSerializer, PackageNameSerialize
 
 
@@ -26,9 +26,14 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        # To be used to identify recommendation
         user = request.user
-        print user
+        recommendation_user = User.objects.filter(email=user.email)
+        if not recommendation_user:
+            recommendation_user = User()
+            recommendation_user.name = user.username
+            recommendation_user.email = user.email
+            recommendation_user.save()
+
         serializer = PackageNameSerialize(data=request.data, many=True)
         if serializer.is_valid():
             valid_data = serializer.validated_data
