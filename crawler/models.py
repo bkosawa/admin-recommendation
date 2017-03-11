@@ -168,6 +168,20 @@ class GoogleSimilarApp(models.Model):
         return '{}, {}'.format(self.source_package, self.similar_package)
 
 
+class SimilarApp(models.Model):
+        source_package = models.CharField(max_length=255)
+        similar_package = models.CharField(max_length=255)
+        distance = models.FloatField(null=True)
+
+        class Meta:
+            managed = False
+            db_table = 'similar_app'
+            unique_together = (('source_package', 'similar_package'),)
+
+        def __unicode__(self):
+            return '{}, {}'.format(self.source_package, self.similar_package)
+
+
 def convert_from_sparse_array(sparse_array):
     rows, cols = sparse_array.nonzero()
     array_dict = dict()
