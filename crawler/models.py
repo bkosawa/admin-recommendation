@@ -24,6 +24,18 @@ class User(models.Model):
         return u'{} {}'.format(self.name, self.email)
 
 
+class UserApps(models.Model):
+    user = models.ForeignKey('User', models.CASCADE)
+    package_name = models.CharField(max_length=255, blank=False, null=False)
+
+    class Meta:
+        managed = False
+        db_table = 'user_apps'
+
+    def __unicode__(self):
+        return u'{} {}'.format(self.user, self.package_name)
+
+
 class App(models.Model):
     package_name = models.CharField(unique=True, max_length=255)
     icon_url = models.CharField(max_length=200, blank=True, null=True)
