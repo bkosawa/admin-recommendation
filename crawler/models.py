@@ -31,6 +31,7 @@ class UserApps(models.Model):
     class Meta:
         managed = False
         db_table = 'user_apps'
+        unique_together = (('user', 'package_name'),)
 
     def __unicode__(self):
         return u'{} {}'.format(self.user, self.package_name)
