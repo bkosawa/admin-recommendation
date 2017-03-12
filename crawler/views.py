@@ -23,9 +23,10 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
         if not recommendation_user:
             return Response(data={'status': 404}, status=status.HTTP_404_NOT_FOUND)
 
-        queryset = App.objects.all()
-        serializer = AppSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # queryset = App.objects.all()
+        # serializer = AppSerializer(queryset, many=True)
+        # return Response(serializer.data, status=status.HTTP_200_OK)
+        return super(RecommendedAppViewSet, self).list(request, args, kwargs)
 
     def create(self, request, *args, **kwargs):
         user = request.user
