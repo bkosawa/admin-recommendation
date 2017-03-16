@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from crawler.models import App, Category, Developer
+from crawler.models import App, Category, Developer, SimilarApp
 from crawler.tasks import AppClassifier
 
 
@@ -49,4 +49,7 @@ class Command(BaseCommand):
         similar_apps = classifier.find_similar_apps()
 
         for app_tuple in similar_apps:
-            print '{} and {} are similar'.format(app_tuple[0].name(), app_tuple[1].name())
+            similar_apps = SimilarApp()
+            similar_apps.source_package = app_tuple[0].package_name
+            similar_apps.similar_package = app_tuple[1].package_name
+            # print '{} and {} are similar'.format(app_tuple[0].name(), app_tuple[1].name())
