@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from crawler.models import App, User, UserApps
+from crawler.models import App, User, UserApps, UserRecommendedApps
 from crawler.serializers import AppSerializer, UserAppsSerializer
 
 
@@ -21,6 +21,10 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
         user = request.user
         recommendation_user = User.objects.filter(email=user.email)
         if not recommendation_user:
+            return Response(data={'status': 404}, status=status.HTTP_404_NOT_FOUND)
+
+        recommended_apps = UserRecommendedApps.objects.filter(user=recommendation_user)
+        if not recommended_apps:
             return Response(data={'status': 404}, status=status.HTTP_404_NOT_FOUND)
 
         # queryset = App.objects.all()
