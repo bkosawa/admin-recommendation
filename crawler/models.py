@@ -37,6 +37,16 @@ class UserApps(models.Model):
         return u'{} {}'.format(self.user, self.package_name)
 
 
+class UserRecommendedApps(models.Model):
+    user = models.ForeignKey('User', models.CASCADE)
+    app = models.ForeignKey('App', models.CASCADE)
+
+    class Meta:
+        managed = False
+        db_table = 'user_recommended_apps'
+        unique_together = (('user', 'app'),)
+
+
 class App(models.Model):
     package_name = models.CharField(unique=True, max_length=255)
     icon_url = models.CharField(max_length=200, blank=True, null=True)
