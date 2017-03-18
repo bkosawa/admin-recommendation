@@ -1,6 +1,7 @@
 import csv
 from datetime import datetime
 
+import logging.config
 import numpy as np
 import requests
 from django.core.exceptions import ValidationError
@@ -9,6 +10,8 @@ from scipy.sparse import dok_matrix
 from sklearn.metrics import pairwise_distances
 
 from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory
+
+logger = logging.getLogger('crawler')
 
 DETAILS_URL = 'http://play.google.com/store/apps/details?id={}&hl={}'
 DATE_MASK = {'en': '%B %d, %Y', 'pt_BR': '%d de %B de %Y'}
@@ -341,6 +344,7 @@ class AppClassifier:
         return similar_apps
 
     def find_similar_apps_with_distance(self):
+        logger.debug('Starting find_similar_apps_with_distance')
         similar_apps = []
         apps_count = len(self.apps_list)
         utility_matrix = self.create_utility_matrix()
@@ -351,6 +355,8 @@ class AppClassifier:
                 other_row = utility_matrix.getrow(j)
                 cos_dist = pairwise_distances(row, other_row, 'cosine')[0][0]
                 if cos_dist < 1.0:
+                    logger.debug('{} and {} - distance: {}'.format(self.apps_list[i], self.apps_list[j], cos_dist))
                     similar_apps.append((self.apps_list[i], self.apps_list[j], cos_dist))
 
+        logger.debug('Finished find_similar_apps_with_distance')
         return similar_apps
