@@ -36,16 +36,19 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--apps_count', type=int, default=-1,
                             help='Number of apps to be classified. Default value is all')
+        parser.add_argument('--boundary', type=float, default=0.6,
+                            help='Minimum value to be considered similar. Default value is 0.6')
 
     def handle(self, *args, **options):
         apps_count = options['apps_count']
+        boundary = options['boundary']
 
         if apps_count < 0:
             apps = App.objects.all()
         else:
             apps = App.objects.all()[:apps_count]
 
-        classifier = AppClassifier(apps, get_features())
+        classifier = AppClassifier(apps, features=get_features(), boundary=boundary)
         similar_apps = classifier.find_similar_apps()
 
         for app_tuple in similar_apps:
