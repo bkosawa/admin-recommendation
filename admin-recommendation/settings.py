@@ -129,6 +129,47 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': "[%(asctime)s] %(levelname)s "
+                      "[%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'file_django': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename':  os.environ.get('ADMIN_RECOM_LOG_FILE', 'django.log'),
+            'formatter': 'verbose'
+        },
+        'file_debug': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename':  os.environ.get('CRAWLER_LOG_FILE', 'command.log'),
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file_django'],
+            'propagate': True,
+            'level': 'INFO',
+        }
+        , 'crawler': {
+            'handlers': ['file_debug'],
+            'propagate': True,
+            'level': 'DEBUG',
+        }
+    }
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
