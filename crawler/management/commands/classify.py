@@ -49,7 +49,7 @@ class Command(BaseCommand):
             apps = App.objects.all()[:apps_count]
 
         classifier = AppClassifier(apps, features=get_features(), boundary=boundary)
-        similar_apps = classifier.find_similar_apps_with_distance()
+        similar_apps = classifier.find_similar_apps()
 
         for app_tuple in similar_apps:
             similar_apps = SimilarApp()

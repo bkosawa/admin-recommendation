@@ -330,7 +330,7 @@ class AppClassifier:
     def is_close_enough(self, cos_dist):
         return cos_dist < self.similarity_boundary
 
-    def find_similar_apps_with_distance(self):
+    def find_similar_apps(self):
         logger.debug('Starting find_similar_apps_with_distance')
         similar_apps = []
         apps_count = len(self.apps_list)
