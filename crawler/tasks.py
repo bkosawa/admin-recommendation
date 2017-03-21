@@ -1,7 +1,7 @@
 import csv
+import logging.config
 from datetime import datetime
 
-import logging.config
 import numpy as np
 import requests
 from django.core.exceptions import ValidationError
@@ -327,6 +327,9 @@ class AppClassifier:
         cos_dist = self.cosine_distance(u, v)
         return cos_dist < self.similarity_boundary
 
+    def is_close_enough(self, cos_dist):
+        return cos_dist < self.similarity_boundary
+
     def find_similar_apps_with_distance(self):
         logger.debug('Starting find_similar_apps_with_distance')
         similar_apps = []
@@ -338,7 +341,7 @@ class AppClassifier:
                 row = utility_matrix.getrow(i)
                 other_row = utility_matrix.getrow(j)
                 cos_dist = self.cosine_distance(other_row, row)
-                if cos_dist < self.similarity_boundary:
+                if self.is_close_enough(cos_dist):
                     logger.debug('{} and {} - distance: {}'.format(self.apps_list[i], self.apps_list[j], cos_dist))
                     similar_apps.append((self.apps_list[i], self.apps_list[j], cos_dist))
 
