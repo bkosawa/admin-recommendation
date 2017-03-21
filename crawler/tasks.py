@@ -324,7 +324,7 @@ class AppClassifier:
         utility_matrix[mat_row, cat_col] = 1
 
     def is_similar(self, u, v):
-        cos_dist = pairwise_distances(u, v, 'cosine')
+        cos_dist = self.cosine_distance(u, v)
         return cos_dist < self.similarity_boundary
 
     def find_similar_apps_with_distance(self):
@@ -337,10 +337,14 @@ class AppClassifier:
             for j in range(i + 1, apps_count):
                 row = utility_matrix.getrow(i)
                 other_row = utility_matrix.getrow(j)
-                cos_dist = pairwise_distances(row, other_row, 'cosine')[0][0]
+                cos_dist = self.cosine_distance(other_row, row)
                 if cos_dist < self.similarity_boundary:
                     logger.debug('{} and {} - distance: {}'.format(self.apps_list[i], self.apps_list[j], cos_dist))
                     similar_apps.append((self.apps_list[i], self.apps_list[j], cos_dist))
 
         logger.debug('Finished find_similar_apps_with_distance')
         return similar_apps
+
+    @staticmethod
+    def cosine_distance(other_row, row):
+        return pairwise_distances(row, other_row, 'cosine')[0][0]
