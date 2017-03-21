@@ -128,7 +128,8 @@ class AppClassifierTest(SimpleTestCase):
         self.assertFalse(self.classifier.is_similar(u, v))
 
     def test_find_similar_apps(self):
-        expected_similar_apps = [(self.apps[0], self.apps[1]), (self.apps[0], self.apps[3])]
-        similar_apps = self.classifier.find_similar_apps()
+        expected_similar_apps = [(self.apps[0], self.apps[1], 0.33333333333333315),
+                                 (self.apps[0], self.apps[3], 0.33333333333333315), ]
+        similar_apps = self.classifier.find_similar_apps_with_distance()
 
         self.assertEqual(similar_apps, expected_similar_apps)
