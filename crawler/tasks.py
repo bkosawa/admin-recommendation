@@ -354,7 +354,7 @@ class AppClassifier:
                 row = utility_matrix.getrow(i)
                 other_row = utility_matrix.getrow(j)
                 cos_dist = pairwise_distances(row, other_row, 'cosine')[0][0]
-                if cos_dist < 1.0:
+                if cos_dist < self.similarity_boundary:
                     logger.debug('{} and {} - distance: {}'.format(self.apps_list[i], self.apps_list[j], cos_dist))
                     similar_apps.append((self.apps_list[i], self.apps_list[j], cos_dist))
 
