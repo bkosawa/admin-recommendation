@@ -57,4 +57,3 @@ class Command(BaseCommand):
             similar_apps.similar_package = app_tuple[1].package_name
             similar_apps.distance = app_tuple[2]
             similar_apps.save()
-            # print '{} and {} are similar'.format(app_tuple[0].name(), app_tuple[1].name())
