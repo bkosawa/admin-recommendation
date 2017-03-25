@@ -9,11 +9,15 @@ https://docs.djangoproject.com/en/1.9/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
+from __future__ import absolute_import
 
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from os.path import normpath, join
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
+from .celery import app as celery_app
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -146,13 +150,13 @@ LOGGING = {
         'file_django': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename':  os.environ.get('ADMIN_RECOM_LOG_FILE', 'django.log'),
+            'filename': os.environ.get('ADMIN_RECOM_LOG_FILE', 'django.log'),
             'formatter': 'verbose'
         },
         'file_debug': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename':  os.environ.get('CRAWLER_LOG_FILE', 'command.log'),
+            'filename': os.environ.get('CRAWLER_LOG_FILE', 'command.log'),
             'formatter': 'verbose'
         },
     },
