@@ -11,7 +11,7 @@ from sklearn.metrics import pairwise_distances
 
 from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory
 
-logger = logging.getLogger('crawler')
+logger = logging.getLogger(__name__)
 
 DETAILS_URL = 'http://play.google.com/store/apps/details?id={}&hl={}'
 DATE_MASK = {'en': '%B %d, %Y', 'pt_BR': '%d de %B de %Y'}

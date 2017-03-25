@@ -158,23 +158,23 @@ LOGGING = {
         'file_django': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.environ.get('ADMIN_RECOM_LOG_FILE', 'django.log'),
+            'filename': os.environ.get('ADMIN_RECOM_LOG_FILE', 'log/django.log'),
             'formatter': 'verbose'
         },
         'file_debug': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.environ.get('CRAWLER_LOG_FILE', 'command.log'),
+            'filename': os.environ.get('CRAWLER_LOG_FILE', 'log/crawler.log'),
             'formatter': 'verbose'
-        },
+        }
     },
     'loggers': {
         'django': {
             'handlers': ['file_django'],
             'propagate': True,
             'level': 'INFO',
-        }
-        , 'crawler': {
+        },
+        'crawler.tasks': {
             'handlers': ['file_debug'],
             'propagate': True,
             'level': 'DEBUG',
