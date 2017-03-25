@@ -15,6 +15,7 @@ from scipy.sparse import dok_matrix
 class User(models.Model):
     name = models.CharField(max_length=60)
     email = models.EmailField(unique=True)
+    recommended_apps = models.ManyToManyField('App')
 
     class Meta:
         managed = False
@@ -35,16 +36,6 @@ class UserApps(models.Model):
 
     def __unicode__(self):
         return u'{} {}'.format(self.user, self.package_name)
-
-
-class UserRecommendedApps(models.Model):
-    user = models.ForeignKey('User', models.CASCADE)
-    app = models.ForeignKey('App', models.CASCADE)
-
-    class Meta:
-        managed = False
-        db_table = 'user_recommended_apps'
-        unique_together = (('user', 'app'),)
 
 
 class App(models.Model):
