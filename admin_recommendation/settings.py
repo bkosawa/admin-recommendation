@@ -71,7 +71,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'admin-recommendation.urls'
+ROOT_URLCONF = 'admin_recommendation.urls'
 
 TEMPLATES = [
     {
@@ -89,7 +89,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'admin-recommendation.wsgi.application'
+WSGI_APPLICATION = 'admin_recommendation.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
@@ -166,6 +166,15 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': os.environ.get('CRAWLER_LOG_FILE', 'log/crawler.log'),
             'formatter': 'verbose'
+        },
+        'celery_task_logger': {
+            'level': 'DEBUG',
+            'filters': None,
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.environ.get('CELERY_LOG_FILE', 'log/celery_tasks.log'),
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 2,
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -178,7 +187,12 @@ LOGGING = {
             'handlers': ['file_debug'],
             'propagate': True,
             'level': 'DEBUG',
-        }
+        },
+        'celery.tasks': {
+            'handlers': ['celery_task_logger'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     }
 }
 
