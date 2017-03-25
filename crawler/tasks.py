@@ -9,7 +9,9 @@ from lxml import html
 from scipy.sparse import dok_matrix
 from sklearn.metrics import pairwise_distances
 
-from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory
+from admin_recommendation.celery import app
+from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory, UserApps, \
+    SimilarApp, User
 
 logger = logging.getLogger(__name__)
 
@@ -354,3 +356,23 @@ class AppClassifier:
     @staticmethod
     def cosine_distance(other_row, row):
         return pairwise_distances(row, other_row, 'cosine')[0][0]
+
+
+@app.task(name='recommend_to_user')
+def recommend_to_user(user_id):
+    # logger.info("finding user: {}".format(user_id))
+    user = User.objects.get(id=user_id)
+    user_apps = UserApps.objects.filter(user=user).all()
+    apps = []
+    for user_app in user_apps:
+        package_name = user_app.package_name
+        similar_apps = SimilarApp.objects.filter(source_package=package_name).all()
+        for similar_app in similar_apps:
+            similar_app_package = similar_app.similar_package
+            if not UserApps.objects.filter(package_name=similar_app_package).exists():
+                app_similar = App.objects.filter(package_name=similar_app_package).first()
+                if app_similar:
+                    apps.append(app_similar)
+    if len(apps) > 0:
+        user.recommended_apps = apps
+        user.save()
