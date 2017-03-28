@@ -46,7 +46,7 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
         serializer = UserAppsSerializer(data=request.data, many=True)
         if serializer.is_valid():
             serializer.save(user=recommendation_user)
-            recommend_to_user(recommendation_user.id)
+            recommend_to_user.delay(recommendation_user.id)
             headers = self.get_success_headers(serializer.data)
             return Response(data=serializer.validated_data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(data={'status': 400}, status=status.HTTP_400_BAD_REQUEST)
