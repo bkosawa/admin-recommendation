@@ -37,7 +37,13 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
 
         queryset = recommended_apps
         serializer = AppSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        list_count = recommended_apps.count()
+        return Response({
+            "count": list_count,
+            "next": None,
+            "previous": None,
+            "results": serializer.data
+        }, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         user = request.user
