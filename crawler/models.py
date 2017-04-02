@@ -135,6 +135,12 @@ class Category(models.Model):
     def get_all_categories():
         return Category.objects.all().order_by('key')
 
+    def name(self):
+        description = self.categorydescription_set.filter(locale='en').all()
+        if description:
+            return u'{}'.format(description[0].name)
+        return u''
+
     # def __str__(self):
     #     return u'(id:' + str(self.id) + ', key:' + str(self.key) + ')'
 
