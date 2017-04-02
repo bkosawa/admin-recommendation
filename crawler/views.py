@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from crawler.models import App, User, UserApps
-from crawler.serializers import AppSerializer, UserAppsSerializer
+from crawler.serializers import AppSerializer, UserAppsSerializer, FullAppSerializer
 from crawler.tasks import recommend_to_user
 
 
@@ -11,6 +11,13 @@ class AppViewSet(viewsets.ModelViewSet):
     queryset = App.objects.all()
     serializer_class = AppSerializer
     http_method_names = ['get', 'options']
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return AppSerializer
+        if self.action == 'retrieve':
+            return FullAppSerializer
+        return AppSerializer
 
 
 class RecommendedAppViewSet(viewsets.ModelViewSet):
