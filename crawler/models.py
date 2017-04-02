@@ -76,6 +76,12 @@ class App(models.Model):
             return u'{}'.format(category.key)
         return u''
 
+    def category_name(self):
+        category = self.appcategory_set.first().category
+        if category:
+            return u'{}'.format(category.name())
+        return u''
+
     def developer_name(self):
         return self.developer.name
 
