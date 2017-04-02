@@ -61,6 +61,12 @@ class App(models.Model):
             return u'{}'.format(description[0].name)
         return u''
 
+    def description(self):
+        description = self.appdescription_set.filter(locale='en').all()
+        if description:
+            return u'{}'.format(description[0].description)
+        return u''
+
     def category(self):
         return self.appcategory_set.first().category
 
