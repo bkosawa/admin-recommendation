@@ -291,8 +291,9 @@ def get_features_total_count(features):
 class AppClassifier:
     apps_list = []
     features = dict()
+    should_persist = False
 
-    def __init__(self, apps, features=None, boundary=0.5):
+    def __init__(self, apps, features=None, boundary=0.5, should_persist=False):
         if len(apps) < 2:
             raise ValueError("Invalid list of apps. It should have more than 1 element.")
 
@@ -300,6 +301,7 @@ class AppClassifier:
         if features:
             self.features = features
         self.similarity_boundary = boundary
+        self.should_persist = should_persist
 
     def create_utility_matrix(self):
         app_count = len(self.apps_list)
@@ -349,6 +351,11 @@ class AppClassifier:
                 if self.is_close_enough(cos_dist):
                     logger.debug('{} and {} - distance: {}'.format(self.apps_list[i], self.apps_list[j], cos_dist))
                     similar_apps.append((self.apps_list[i], self.apps_list[j], cos_dist))
+                    if self.should_persist:
+                        similar = SimilarApp()
+                        similar.source_package = self.apps_list[i].package_name
+                        similar.similar_package = self.apps_list[j].package_name
+                        similar.distance = cos_dist
 
         logger.debug('Finished find_similar_apps_with_distance')
         return similar_apps
