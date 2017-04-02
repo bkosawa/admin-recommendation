@@ -292,7 +292,7 @@ class AppClassifier:
     apps_list = []
     features = dict()
 
-    def __init__(self, apps, features=None, boundary=0.6):
+    def __init__(self, apps, features=None, boundary=0.5):
         if len(apps) < 2:
             raise ValueError("Invalid list of apps. It should have more than 1 element.")
 
