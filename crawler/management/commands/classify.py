@@ -38,22 +38,26 @@ class Command(BaseCommand):
                             help='Number of apps to be classified. Default value is all')
         parser.add_argument('--boundary', type=float, default=0.5,
                             help='Minimum value to be considered similar. Default value is 0.5')
+        parser.add_argument('--persist', type=bool, default=False,
+                            help='Boolean that indicate if it should persist while iterating. Default value is False')
 
     def handle(self, *args, **options):
         apps_count = options['apps_count']
         boundary = options['boundary']
+        persist = options['persist']
 
         if apps_count < 0:
             apps = App.objects.all()
         else:
             apps = App.objects.all()[:apps_count]
 
-        classifier = AppClassifier(apps, features=get_features(), boundary=boundary)
+        classifier = AppClassifier(apps, features=get_features(), boundary=boundary, should_persist=persist)
         similar_apps = classifier.find_similar_apps()
 
-        for app_tuple in similar_apps:
-            similar_apps = SimilarApp()
-            similar_apps.source_package = app_tuple[0].package_name
-            similar_apps.similar_package = app_tuple[1].package_name
-            similar_apps.distance = app_tuple[2]
-            similar_apps.save()
+        if not persist:
+            for app_tuple in similar_apps:
+                similar_apps = SimilarApp()
+                similar_apps.source_package = app_tuple[0].package_name
+                similar_apps.similar_package = app_tuple[1].package_name
+                similar_apps.distance = app_tuple[2]
+                similar_apps.save()
