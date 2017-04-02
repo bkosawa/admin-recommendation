@@ -391,6 +391,15 @@ def recommend_to_user(user_id):
                 app_similar = App.objects.filter(package_name=similar_app_package).first()
                 if app_similar:
                     apps.append(app_similar)
+
+        other_similar_apps = SimilarApp.objects.filter(similar_package=package_name).all()
+        for similar_app in other_similar_apps:
+            similar_app_package = similar_app.similar_package
+            if not UserApps.objects.filter(package_name=similar_app_package).exists():
+                app_similar = App.objects.filter(package_name=similar_app_package).first()
+                if app_similar:
+                    apps.append(app_similar)
+
     if len(apps) > 0:
         user.recommended_apps = apps
         user.save()
