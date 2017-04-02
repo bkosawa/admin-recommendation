@@ -40,18 +40,27 @@ class Command(BaseCommand):
                             help='Minimum value to be considered similar. Default value is 0.5')
         parser.add_argument('--persist', type=bool, default=False,
                             help='Boolean that indicate if it should persist while iterating. Default value is False')
+        parser.add_argument('--offset', type=int, default=0,
+                            help='Indicate starting row to continue classification. Default value is 0')
+        parser.add_argument('--starting_at', type=int, default=0,
+                            help='Starting point of classification list. Default value is 0')
 
     def handle(self, *args, **options):
         apps_count = options['apps_count']
         boundary = options['boundary']
         persist = options['persist']
+        offset = options['offset']
+        starting_at = options['starting_at']
 
         if apps_count < 0:
-            apps = App.objects.all()
+            apps = App.objects.all()[starting_at:]
         else:
-            apps = App.objects.all()[:apps_count]
+            apps = App.objects.all()[starting_at:starting_at + apps_count]
 
-        classifier = AppClassifier(apps, features=get_features(), boundary=boundary, should_persist=persist)
+        classifier = AppClassifier(apps, features=get_features(),
+                                   boundary=boundary,
+                                   should_persist=persist,
+                                   offset=offset)
         similar_apps = classifier.find_similar_apps()
 
         if not persist:

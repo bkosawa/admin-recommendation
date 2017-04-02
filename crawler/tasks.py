@@ -292,8 +292,9 @@ class AppClassifier:
     apps_list = []
     features = dict()
     should_persist = False
+    offset = 0
 
-    def __init__(self, apps, features=None, boundary=0.5, should_persist=False):
+    def __init__(self, apps, features=None, boundary=0.5, should_persist=False, offset=0):
         if len(apps) < 2:
             raise ValueError("Invalid list of apps. It should have more than 1 element.")
 
@@ -302,6 +303,7 @@ class AppClassifier:
             self.features = features
         self.similarity_boundary = boundary
         self.should_persist = should_persist
+        self.offset = offset
 
     def create_utility_matrix(self):
         app_count = len(self.apps_list)
@@ -338,12 +340,20 @@ class AppClassifier:
         return cos_dist < self.similarity_boundary
 
     def find_similar_apps(self):
-        logger.debug('Starting find_similar_apps_with_distance')
+        logger.debug('Starting find_similar_apps at {}'.format(datetime.now()))
+
+        similar_apps = self.find_similar_apps_with_offset(self.offset)
+
+        logger.debug('Finished find_similar_apps at {}'.format(datetime.now()))
+        return similar_apps
+
+    def find_similar_apps_with_offset(self, offset):
+        logger.debug('Starting find_similar_apps_with_offset with {}'.format(offset))
         similar_apps = []
         apps_count = len(self.apps_list)
         utility_matrix = self.create_utility_matrix()
 
-        for i in range(0, apps_count - 1):
+        for i in range(offset, apps_count - 1):
             for j in range(i + 1, apps_count):
                 row = utility_matrix.getrow(i)
                 other_row = utility_matrix.getrow(j)
@@ -356,8 +366,9 @@ class AppClassifier:
                         similar.source_package = self.apps_list[i].package_name
                         similar.similar_package = self.apps_list[j].package_name
                         similar.distance = cos_dist
+            logger.debug('Finished row {}'.format(i))
 
-        logger.debug('Finished find_similar_apps_with_distance')
+        logger.debug('Finished find_similar_apps_with_offset')
         return similar_apps
 
     @staticmethod
