@@ -366,6 +366,7 @@ class AppClassifier:
                         similar.source_package = self.apps_list[i].package_name
                         similar.similar_package = self.apps_list[j].package_name
                         similar.distance = cos_dist
+                        similar.save()
             logger.debug('Finished row {}'.format(i))
 
         logger.debug('Finished find_similar_apps_with_offset')
