@@ -296,8 +296,9 @@ class AppClassifier:
     features = dict()
     should_persist = False
     offset = 0
+    target_area = None
 
-    def __init__(self, apps, features=None, boundary=0.5, should_persist=False, offset=0):
+    def __init__(self, apps, features=None, boundary=0.5, should_persist=False, offset=0, target_area=None):
         if len(apps) < 2:
             raise ValueError("Invalid list of apps. It should have more than 1 element.")
 
@@ -307,6 +308,7 @@ class AppClassifier:
         self.similarity_boundary = boundary
         self.should_persist = should_persist
         self.offset = offset
+        self.target_area = target_area
 
     def create_utility_matrix(self):
         app_count = len(self.apps_list)
@@ -345,7 +347,10 @@ class AppClassifier:
     def find_similar_apps(self):
         logger.debug('Starting find_similar_apps at {}'.format(datetime.now()))
 
-        similar_apps = self.find_similar_apps_with_offset(self.offset)
+        if not self.target_area:
+            similar_apps = self.find_similar_apps_with_offset(self.offset)
+        else:
+            similar_apps = self.find_similar_apps_in_area(self.target_area)
 
         logger.debug('Finished find_similar_apps at {}'.format(datetime.now()))
         return similar_apps
@@ -365,6 +370,30 @@ class AppClassifier:
             logger.debug('Finished row {}'.format(i))
 
         logger.debug('Finished find_similar_apps_with_offset')
+        return self.similar_apps
+
+    def find_similar_apps_in_area(self, area):
+        logger.debug('Starting in ({}, {}) to ({}, {})'
+                     .format(area[0][0], area[0][1],
+                             area[1][0], area[1][1]))
+
+        utility_matrix = self.create_utility_matrix()
+
+        starting_row = area[0][0]
+        ending_row = area[1][0]
+        starting_column = area[0][1]
+        ending_column = area[1][1]
+
+        for i in range(starting_row, ending_row):
+            actual_starting_column = starting_column
+            if starting_column <= starting_row:
+                actual_starting_column = i + 1
+            for j in range(actual_starting_column, ending_column):
+                self.calculate_similarity(self.apps_list[i],
+                                          self.apps_list[j],
+                                          utility_matrix.getrow(i),
+                                          utility_matrix.getrow(j))
+
         return self.similar_apps
 
     def calculate_similarity(self, one_app, another_app, one_app_features, another_app_features):
