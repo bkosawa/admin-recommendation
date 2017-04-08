@@ -291,6 +291,7 @@ def get_features_total_count(features):
 
 
 class AppClassifier:
+    similar_apps = []
     apps_list = []
     features = dict()
     should_persist = False
@@ -351,35 +352,36 @@ class AppClassifier:
 
     def find_similar_apps_with_offset(self, offset):
         logger.debug('Starting find_similar_apps_with_offset with {}'.format(offset))
-        similar_apps = []
         apps_count = len(self.apps_list)
         utility_matrix = self.create_utility_matrix()
 
         for i in range(offset, apps_count - 1):
             for j in range(i + 1, apps_count):
-                row = utility_matrix.getrow(i)
-                other_row = utility_matrix.getrow(j)
-                cos_dist = self.cosine_distance(other_row, row)
-                if self.is_close_enough(cos_dist):
-                    logger.debug('{} and {} - distance: {}'.format(self.apps_list[i], self.apps_list[j], cos_dist))
-                    similar_apps.append((self.apps_list[i], self.apps_list[j], cos_dist))
-                    if self.should_persist:
-                        similar = SimilarApp()
-                        similar.source_package = self.apps_list[i].package_name
-                        similar.similar_package = self.apps_list[j].package_name
-                        similar.distance = cos_dist
-                        try:
-                            close_old_connections()
-                            similar.save()
-                        except OperationalError:
-                            logger.debug('Fail to save;{};{};{}'.format(self.apps_list[i],
-                                                                        self.apps_list[j],
-                                                                        cos_dist))
+                self.calculate_similarity(self.apps_list[i],
+                                          self.apps_list[j],
+                                          utility_matrix.getrow(i),
+                                          utility_matrix.getrow(j))
 
             logger.debug('Finished row {}'.format(i))
 
         logger.debug('Finished find_similar_apps_with_offset')
-        return similar_apps
+        return self.similar_apps
+
+    def calculate_similarity(self, one_app, another_app, one_app_features, another_app_features):
+        cos_dist = self.cosine_distance(another_app_features, one_app_features)
+        if self.is_close_enough(cos_dist):
+            logger.debug('{} and {} - distance: {}'.format(one_app, another_app, cos_dist))
+            self.similar_apps.append((one_app, another_app, cos_dist))
+            if self.should_persist:
+                similar = SimilarApp()
+                similar.source_package = one_app.package_name
+                similar.similar_package = another_app.package_name
+                similar.distance = cos_dist
+                try:
+                    close_old_connections()
+                    similar.save()
+                except OperationalError:
+                    logger.debug('Fail to save;{};{};{}'.format(one_app, another_app, cos_dist))
 
     @staticmethod
     def cosine_distance(other_row, row):
