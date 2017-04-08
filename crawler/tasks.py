@@ -5,6 +5,8 @@ from datetime import datetime
 import numpy as np
 import requests
 from django.core.exceptions import ValidationError
+from django.db import close_old_connections
+from django.db.utils import OperationalError
 from lxml import html
 from scipy.sparse import dok_matrix
 from sklearn.metrics import pairwise_distances
@@ -366,7 +368,14 @@ class AppClassifier:
                         similar.source_package = self.apps_list[i].package_name
                         similar.similar_package = self.apps_list[j].package_name
                         similar.distance = cos_dist
-                        similar.save()
+                        try:
+                            close_old_connections()
+                            similar.save()
+                        except OperationalError:
+                            logger.debug('Fail to save;{};{};{}'.format(self.apps_list[i],
+                                                                        self.apps_list[j],
+                                                                        cos_dist))
+
             logger.debug('Finished row {}'.format(i))
 
         logger.debug('Finished find_similar_apps_with_offset')
