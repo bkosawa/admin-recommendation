@@ -360,14 +360,14 @@ class AppClassifier:
         apps_count = len(self.apps_list)
         utility_matrix = self.create_utility_matrix()
 
-        for i in range(offset, apps_count - 1):
-            for j in range(i + 1, apps_count):
-                self.calculate_similarity(self.apps_list[i],
-                                          self.apps_list[j],
-                                          utility_matrix.getrow(i),
-                                          utility_matrix.getrow(j))
+        for row in range(offset, apps_count - 1):
+            for column in range(row + 1, apps_count):
+                self.calculate_similarity(self.apps_list[row],
+                                          self.apps_list[column],
+                                          utility_matrix.getrow(row),
+                                          utility_matrix.getrow(column))
 
-            logger.debug('Finished row {}'.format(i))
+            logger.debug('Finished row {}'.format(row))
 
         logger.debug('Finished find_similar_apps_with_offset')
         return self.similar_apps
@@ -384,15 +384,16 @@ class AppClassifier:
         starting_column = area[0][1]
         ending_column = area[1][1]
 
-        for i in range(starting_row, ending_row):
+        for row in range(starting_row, ending_row):
             actual_starting_column = starting_column
-            if starting_column <= starting_row:
-                actual_starting_column = i + 1
-            for j in range(actual_starting_column, ending_column):
-                self.calculate_similarity(self.apps_list[i],
-                                          self.apps_list[j],
-                                          utility_matrix.getrow(i),
-                                          utility_matrix.getrow(j))
+            if starting_column <= row:
+                actual_starting_column = row + 1
+            for column in range(actual_starting_column, ending_column):
+                self.calculate_similarity(self.apps_list[row],
+                                          self.apps_list[column],
+                                          utility_matrix.getrow(row),
+                                          utility_matrix.getrow(column))
+            logger.debug('Finished row {}'.format(row))
 
         return self.similar_apps
 
