@@ -1,5 +1,6 @@
 # Register your models here.
 from django.contrib import admin
+
 from crawler import models, forms
 
 
@@ -16,6 +17,11 @@ class CategoryDescriptionAdminInline(admin.TabularInline):
 class CategoryAdminInline(admin.TabularInline):
     extra = 0
     model = models.AppCategory
+
+
+class UserAppsAdminInLine(admin.TabularInline):
+    extra = 0
+    model = models.UserApps
 
 
 @admin.register(models.App)
@@ -43,3 +49,8 @@ class DeveloperAdmin(admin.ModelAdmin):
 @admin.register(models.Category)
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [CategoryDescriptionAdminInline]
+
+
+@admin.register(models.User)
+class UserAppsAdmin(admin.ModelAdmin):
+    inlines = [UserAppsAdminInLine]
