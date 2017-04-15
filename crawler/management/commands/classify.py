@@ -62,14 +62,14 @@ class Command(BaseCommand):
                                    target_area=area)
         similar_apps = classifier.find_similar_apps()
 
-        if not persist:
-            if similar_apps:
-                for app_tuple in similar_apps:
-                    similar_apps = SimilarApp()
-                    similar_apps.source_package = app_tuple[0].package_name
-                    similar_apps.similar_package = app_tuple[1].package_name
-                    similar_apps.distance = app_tuple[2]
-                    similar_apps.save()
+        # if not persist:
+        #     if similar_apps:
+        #         for app_tuple in similar_apps:
+        #             similar_apps = SimilarApp()
+        #             similar_apps.source_package = app_tuple[0].package_name
+        #             similar_apps.similar_package = app_tuple[1].package_name
+        #             similar_apps.distance = app_tuple[2]
+        #             similar_apps.save()
 
     @staticmethod
     def get_arguments(options):
@@ -89,8 +89,9 @@ class Command(BaseCommand):
 
     @staticmethod
     def validate_area(area):
-        if area and len(area) != 4:
-            raise CommandError("Option `--area ` must have 4 integer elements.")
+        if area:
+            if len(area) != 4:
+                raise CommandError("Option `--area ` must have 4 integer elements.")
 
-        if area[0] > area[2] or area[1] > area[3]:
-            raise CommandError("Option `--area ` ending point must be greater than starting point")
+            if area[0] > area[2] or area[1] > area[3]:
+                raise CommandError("Option `--area ` ending point must be greater than starting point")
