@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from crawler.models import App, Category, Developer, SimilarApp
 from crawler.tasks import AppClassifier
@@ -44,13 +44,11 @@ class Command(BaseCommand):
                             help='Indicate starting row to continue classification. Default value is 0')
         parser.add_argument('--starting_at', type=int, default=0,
                             help='Starting point of classification list. Default value is 0')
+        parser.add_argument('--area', nargs="+", type=int, default=None,
+                            help='Area of classification matrix. Default value is None')
 
     def handle(self, *args, **options):
-        apps_count = options['apps_count']
-        boundary = options['boundary']
-        persist = options['persist']
-        offset = options['offset']
-        starting_at = options['starting_at']
+        apps_count, area, boundary, offset, persist, starting_at = self.get_arguments(options)
 
         if apps_count < 0:
             apps = App.objects.all()[starting_at:]
@@ -60,13 +58,39 @@ class Command(BaseCommand):
         classifier = AppClassifier(apps, features=get_features(),
                                    boundary=boundary,
                                    should_persist=persist,
-                                   offset=offset)
+                                   offset=offset,
+                                   target_area=area)
         similar_apps = classifier.find_similar_apps()
 
         if not persist:
-            for app_tuple in similar_apps:
-                similar_apps = SimilarApp()
-                similar_apps.source_package = app_tuple[0].package_name
-                similar_apps.similar_package = app_tuple[1].package_name
-                similar_apps.distance = app_tuple[2]
-                similar_apps.save()
+            if similar_apps:
+                for app_tuple in similar_apps:
+                    similar_apps = SimilarApp()
+                    similar_apps.source_package = app_tuple[0].package_name
+                    similar_apps.similar_package = app_tuple[1].package_name
+                    similar_apps.distance = app_tuple[2]
+                    similar_apps.save()
+
+    @staticmethod
+    def get_arguments(options):
+        apps_count = options['apps_count']
+        boundary = options['boundary']
+        persist = options['persist']
+        offset = options['offset']
+        starting_at = options['starting_at']
+        area = options['area']
+        area_tuple = None
+        Command.validate_area(area)
+        if area:
+            apps_count = max(area[2], area[3])
+            area_tuple = ((area[0], area[1]), (area[2], area[3]))
+
+        return apps_count, area_tuple, boundary, offset, persist, starting_at
+
+    @staticmethod
+    def validate_area(area):
+        if area and len(area) != 4:
+            raise CommandError("Option `--area ` must have 4 integer elements.")
+
+        if area[0] > area[2] or area[1] > area[3]:
+            raise CommandError("Option `--area ` ending point must be greater than starting point")

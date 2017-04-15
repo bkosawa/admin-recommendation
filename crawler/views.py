@@ -2,9 +2,9 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 
+from crawler.celery_tasks import recommend_to_user
 from crawler.models import App, User, UserApps
 from crawler.serializers import AppSerializer, UserAppsSerializer, FullAppSerializer
-from crawler.tasks import recommend_to_user
 
 
 class AppViewSet(viewsets.ModelViewSet):

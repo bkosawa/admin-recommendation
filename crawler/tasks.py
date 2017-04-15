@@ -11,9 +11,7 @@ from lxml import html
 from scipy.sparse import dok_matrix
 from sklearn.metrics import pairwise_distances
 
-from admin_recommendation.celery import app
-from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory, UserApps, \
-    SimilarApp, User
+from crawler.models import App, AppDescription, Category, CategoryDescription, Developer, AppCategory, SimilarApp
 
 logger = logging.getLogger(__name__)
 
@@ -291,12 +289,14 @@ def get_features_total_count(features):
 
 
 class AppClassifier:
+    similar_apps = []
     apps_list = []
     features = dict()
     should_persist = False
     offset = 0
+    target_area = None
 
-    def __init__(self, apps, features=None, boundary=0.5, should_persist=False, offset=0):
+    def __init__(self, apps, features=None, boundary=0.5, should_persist=False, offset=0, target_area=None):
         if len(apps) < 2:
             raise ValueError("Invalid list of apps. It should have more than 1 element.")
 
@@ -306,6 +306,7 @@ class AppClassifier:
         self.similarity_boundary = boundary
         self.should_persist = should_persist
         self.offset = offset
+        self.target_area = target_area
 
     def create_utility_matrix(self):
         app_count = len(self.apps_list)
@@ -344,72 +345,72 @@ class AppClassifier:
     def find_similar_apps(self):
         logger.debug('Starting find_similar_apps at {}'.format(datetime.now()))
 
-        similar_apps = self.find_similar_apps_with_offset(self.offset)
+        if not self.target_area:
+            similar_apps = self.find_similar_apps_with_offset(self.offset)
+        else:
+            similar_apps = self.find_similar_apps_in_area(self.target_area)
 
         logger.debug('Finished find_similar_apps at {}'.format(datetime.now()))
         return similar_apps
 
     def find_similar_apps_with_offset(self, offset):
         logger.debug('Starting find_similar_apps_with_offset with {}'.format(offset))
-        similar_apps = []
         apps_count = len(self.apps_list)
         utility_matrix = self.create_utility_matrix()
 
-        for i in range(offset, apps_count - 1):
-            for j in range(i + 1, apps_count):
-                row = utility_matrix.getrow(i)
-                other_row = utility_matrix.getrow(j)
-                cos_dist = self.cosine_distance(other_row, row)
-                if self.is_close_enough(cos_dist):
-                    logger.debug('{} and {} - distance: {}'.format(self.apps_list[i], self.apps_list[j], cos_dist))
-                    similar_apps.append((self.apps_list[i], self.apps_list[j], cos_dist))
-                    if self.should_persist:
-                        similar = SimilarApp()
-                        similar.source_package = self.apps_list[i].package_name
-                        similar.similar_package = self.apps_list[j].package_name
-                        similar.distance = cos_dist
-                        try:
-                            close_old_connections()
-                            similar.save()
-                        except OperationalError:
-                            logger.debug('Fail to save;{};{};{}'.format(self.apps_list[i],
-                                                                        self.apps_list[j],
-                                                                        cos_dist))
+        for row in range(offset, apps_count - 1):
+            for column in range(row + 1, apps_count):
+                self.calculate_similarity(self.apps_list[row],
+                                          self.apps_list[column],
+                                          utility_matrix.getrow(row),
+                                          utility_matrix.getrow(column))
 
-            logger.debug('Finished row {}'.format(i))
+            logger.debug('Finished row {}'.format(row))
 
         logger.debug('Finished find_similar_apps_with_offset')
-        return similar_apps
+        return self.similar_apps
+
+    def find_similar_apps_in_area(self, area):
+        logger.debug('Starting in ({}, {}) to ({}, {})'
+                     .format(area[0][0], area[0][1],
+                             area[1][0], area[1][1]))
+
+        utility_matrix = self.create_utility_matrix()
+
+        starting_row = area[0][0]
+        ending_row = area[1][0]
+        starting_column = area[0][1]
+        ending_column = area[1][1]
+
+        for row in range(starting_row, ending_row):
+            actual_starting_column = starting_column
+            if starting_column <= row:
+                actual_starting_column = row + 1
+            for column in range(actual_starting_column, ending_column):
+                self.calculate_similarity(self.apps_list[row],
+                                          self.apps_list[column],
+                                          utility_matrix.getrow(row),
+                                          utility_matrix.getrow(column))
+            logger.debug('Finished row {}'.format(row))
+
+        return self.similar_apps
+
+    def calculate_similarity(self, one_app, another_app, one_app_features, another_app_features):
+        cos_dist = self.cosine_distance(another_app_features, one_app_features)
+        if self.is_close_enough(cos_dist):
+            logger.debug('{} and {} - distance: {}'.format(one_app, another_app, cos_dist))
+            self.similar_apps.append((one_app, another_app, cos_dist))
+            if self.should_persist:
+                similar = SimilarApp()
+                similar.source_package = one_app.package_name
+                similar.similar_package = another_app.package_name
+                similar.distance = cos_dist
+                try:
+                    close_old_connections()
+                    similar.save()
+                except OperationalError:
+                    logger.debug('Fail to save;{};{};{}'.format(one_app, another_app, cos_dist))
 
     @staticmethod
     def cosine_distance(other_row, row):
         return pairwise_distances(row, other_row, 'cosine')[0][0]
-
-
-@app.task(name='recommend_to_user')
-def recommend_to_user(user_id):
-    # logger.info("finding user: {}".format(user_id))
-    user = User.objects.get(id=user_id)
-    user_apps = UserApps.objects.filter(user=user).all()
-    apps = []
-    for user_app in user_apps:
-        package_name = user_app.package_name
-        similar_apps = SimilarApp.objects.filter(source_package=package_name).all()
-        for similar_app in similar_apps:
-            similar_app_package = similar_app.similar_package
-            if not UserApps.objects.filter(package_name=similar_app_package).exists():
-                app_similar = App.objects.filter(package_name=similar_app_package).first()
-                if app_similar:
-                    apps.append(app_similar)
-
-        other_similar_apps = SimilarApp.objects.filter(similar_package=package_name).all()
-        for similar_app in other_similar_apps:
-            similar_app_package = similar_app.similar_package
-            if not UserApps.objects.filter(package_name=similar_app_package).exists():
-                app_similar = App.objects.filter(package_name=similar_app_package).first()
-                if app_similar:
-                    apps.append(app_similar)
-
-    if len(apps) > 0:
-        user.recommended_apps = apps
-        user.save()
