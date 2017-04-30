@@ -19,6 +19,67 @@ DETAILS_URL = 'http://play.google.com/store/apps/details?id={}&hl={}'
 DATE_MASK = {'en': '%B %d, %Y', 'pt_BR': '%d de %B de %Y'}
 
 
+def save_developer(developer):
+    developer, developer_created = Developer.objects.get_or_create(
+        name=developer.name,
+    )
+    return developer
+
+
+def save_app(app):
+    app, app_created = App.objects.get_or_create(
+        package_name=app.package_name,
+        defaults={
+            'icon_url': app.icon_url,
+            'size': app.size,
+            'publication_date': app.publication_date,
+            'rating': app.rating,
+            'version': app.version,
+            'content_rating': app.content_rating,
+            'developer': app.developer
+        },
+    )
+    return app
+
+
+def save_app_description(app_description):
+    app_description = AppDescription.objects.get_or_create(
+        app=app_description.app,
+        locale=app_description.locale,
+        defaults={
+            'name': app_description.name,
+            'description': app_description.description
+        },
+    )
+    return app_description
+
+
+def save_category(category):
+    category, category_created = Category.objects.get_or_create(
+        key=category.key,
+    )
+    return category
+
+
+def save_category_description(category_description):
+    category_description, category_description_created = CategoryDescription.objects.get_or_create(
+        category=category_description.category,
+        locale=category_description.locale,
+        defaults={
+            'name': category_description.name
+        }
+    )
+    return category_description
+
+
+def save_app_category(app_category):
+    app_category, app_category_created = AppCategory.objects.get_or_create(
+        app=app_category.app,
+        category=app_category.category,
+    )
+    return app_category
+
+
 class Crawler:
     def __init__(self):
         pass
@@ -186,58 +247,27 @@ class Crawler:
 
         developer = self.populate_developer(content)
 
-        developer, developer_created = Developer.objects.get_or_create(
-            name=developer.name,
-        )
+        developer = save_developer(developer)
 
         app = self.populate_app(content, app_package, developer, loc)
 
-        app, app_created = App.objects.get_or_create(
-            package_name=app.package_name,
-            defaults={
-                'icon_url': app.icon_url,
-                'size': app.size,
-                'publication_date': app.publication_date,
-                'rating': app.rating,
-                'version': app.version,
-                'content_rating': app.content_rating,
-                'developer': app.developer
-            },
-        )
+        app = save_app(app)
 
         app_description = self.populate_app_description(content, app, loc)
 
-        app_description = AppDescription.objects.get_or_create(
-            app=app_description.app,
-            locale=app_description.locale,
-            defaults={
-                'name': app_description.name,
-                'description': app_description.description
-            },
-        )
+        app_description = save_app_description(app_description)
 
         category = self.populate_category(content)
 
-        category, category_created = Category.objects.get_or_create(
-            key=category.key,
-        )
+        category = save_category(category)
 
         category_description = self.populate_category_description(content, category, loc)
 
-        category_description, category_description_created = CategoryDescription.objects.get_or_create(
-            category=category_description.category,
-            locale=category_description.locale,
-            defaults={
-                'name': category_description.name
-            }
-        )
+        category_description = save_category_description(category_description)
 
         app_category = self.populate_app_category(app, category)
 
-        app_description, app_category = AppCategory.objects.get_or_create(
-            app=app_category.app,
-            category=app_category.category,
-        )
+        save_app_category(app_category)
 
         similars = self.extract_similars(content)
 
@@ -248,6 +278,7 @@ class Crawler:
                 'category_description': category_description,
                 'similars': similars,
                 }
+
 
     def crawl(self, app_packages, date):
         with open('error-apps-id-list-{}.txt'.format(date), 'w') as error_file, \
