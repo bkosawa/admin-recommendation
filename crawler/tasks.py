@@ -265,9 +265,7 @@ class Crawler:
                         continue
                     if app_details_map.get('similars'):
                         for similar in app_details_map.get('similars'):
-                            csv_writer = csv.writer(similar_file, delimiter=';', quotechar='"',
-                                                    quoting=csv.QUOTE_MINIMAL)
-                            csv_writer.writerow([package, similar])
+                            self.write_in_csv(package, similar, similar_file)
                     crawled_count += 1
                 except IOError as e:
                     print('Error on parsing')
@@ -279,6 +277,12 @@ class Crawler:
                     pass
 
             return crawled_count, total_count
+
+    @staticmethod
+    def write_in_csv(package, similar, similar_file):
+        csv_writer = csv.writer(similar_file, delimiter=';', quotechar='"',
+                                quoting=csv.QUOTE_MINIMAL)
+        csv_writer.writerow([package, similar])
 
 
 def get_features_total_count(features):
