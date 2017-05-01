@@ -20,11 +20,14 @@ class Command(BaseCommand):
             logger.error('File attribute is mandatory!!')
             raise CommandError('--file attribute is mandatory!!')
 
+        counter = 0
         failed_csv = csv.reader(app_similar_packages, delimiter=';', quotechar='"')
         for row in failed_csv:
+            counter += 1
             logger.debug('Saving {} and {} are at distance of {}'.format(row[0], row[1], row[2]))
             SimilarApp.objects.get_or_create(
                 source_package=row[0],
                 similar_package=row[1],
                 distance=row[2]
             )
+        logger.debug('{} similarities were processed'.format(counter))
