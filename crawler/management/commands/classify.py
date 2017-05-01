@@ -62,14 +62,14 @@ class Command(BaseCommand):
                                    target_area=area)
         similar_apps = classifier.find_similar_apps()
 
-        # if not persist:
-        #     if similar_apps:
-        #         for app_tuple in similar_apps:
-        #             similar_apps = SimilarApp()
-        #             similar_apps.source_package = app_tuple[0].package_name
-        #             similar_apps.similar_package = app_tuple[1].package_name
-        #             similar_apps.distance = app_tuple[2]
-        #             similar_apps.save()
+        if not persist:
+            if similar_apps:
+                for app_tuple in similar_apps:
+                    similar_apps = SimilarApp()
+                    similar_apps.source_package = app_tuple[0].package_name
+                    similar_apps.similar_package = app_tuple[1].package_name
+                    similar_apps.distance = app_tuple[2]
+                    similar_apps.save()
 
     @staticmethod
     def get_arguments(options):
