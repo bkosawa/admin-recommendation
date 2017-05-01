@@ -167,6 +167,12 @@ LOGGING = {
             'filename': os.environ.get('CRAWLER_LOG_FILE', 'log/crawler.log'),
             'formatter': 'verbose'
         },
+        'file_command': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.environ.get('COMMAND_LOG_FILE', 'log/command.log'),
+            'formatter': 'verbose'
+        },
         'celery_task_logger': {
             'level': 'DEBUG',
             'filters': None,
@@ -185,6 +191,11 @@ LOGGING = {
         },
         'crawler.tasks': {
             'handlers': ['file_debug'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'crawler.command': {
+            'handlers': ['file_command'],
             'propagate': True,
             'level': 'DEBUG',
         },
