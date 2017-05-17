@@ -34,10 +34,16 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
         offset, limit = self.extract_pagination_options(request)
         user_apps = UserApps.objects.filter(user_id=recommendation_user.id).all()
         user_app_packages = list(user_apps.values_list('package_name', flat=True))
-        recommended_apps \
-            = recommendation_user.recommended_apps.exclude(package_name__in=user_app_packages).all()[offset:limit]
+        recommended_apps = recommendation_user.recommended_apps.exclude(package_name__in=user_app_packages).all()
         if not recommended_apps:
             return Response(data={'status': 404}, status=status.HTTP_404_NOT_FOUND)
+
+        if offset > recommended_apps.count():
+            return Response(data={'status': 404}, status=status.HTTP_204_NO_CONTENT)
+        elif offset + limit < recommended_apps.count():
+            recommended_apps = recommended_apps[offset:limit]
+        else:
+            recommended_apps = recommended_apps[offset:recommended_apps.count()]
 
         queryset = recommended_apps
         serializer = AppSerializer(queryset, many=True)
