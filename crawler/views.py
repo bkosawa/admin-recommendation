@@ -43,7 +43,7 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
         if offset > list_count:
             return Response(data={'status': 204}, status=status.HTTP_204_NO_CONTENT)
         elif offset + limit < list_count:
-            recommended_apps = recommended_apps[offset:limit]
+            recommended_apps = recommended_apps[offset:offset + limit]
         else:
             recommended_apps = recommended_apps[offset:list_count]
 
