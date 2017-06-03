@@ -38,16 +38,18 @@ class RecommendedAppViewSet(viewsets.ModelViewSet):
         if not recommended_apps:
             return Response(data={'status': 404}, status=status.HTTP_404_NOT_FOUND)
 
-        if offset > recommended_apps.count():
-            return Response(data={'status': 404}, status=status.HTTP_204_NO_CONTENT)
-        elif offset + limit < recommended_apps.count():
+        list_count = len(recommended_apps)
+
+        if offset > list_count:
+            return Response(data={'status': 204}, status=status.HTTP_204_NO_CONTENT)
+        elif offset + limit < list_count:
             recommended_apps = recommended_apps[offset:limit]
         else:
-            recommended_apps = recommended_apps[offset:recommended_apps.count()]
+            recommended_apps = recommended_apps[offset:list_count]
 
         queryset = recommended_apps
         serializer = AppSerializer(queryset, many=True)
-        list_count = recommended_apps.count()
+
         return Response({
             "count": list_count,
             "next": None,
