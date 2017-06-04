@@ -28,7 +28,7 @@ class Command(BaseCommand):
                 if self.is_compatible_with_google(similar_app):
                     count = count + 1
 
-            percentage = count / total
+            percentage = float(count) / total
             if percentage not in result_dict:
                 result_count = 0
             else:

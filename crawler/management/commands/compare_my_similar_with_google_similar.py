@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
         admin_file = open('comparison.csv', 'w')
         admin_file.write('{};{}\n'.format('Percentage of Compatibility', 'Total Similarity'))
-        admin_file.write('{};{}\n'.format(compatibility_count / len(similar_apps), len(similar_apps)))
+        admin_file.write('{};{}\n'.format(float(compatibility_count) / len(similar_apps), len(similar_apps)))
         admin_file.close()
         self.stdout.write(self.style.SUCCESS(
             'Compatible Count: {} - Similar Count: {}'.format(compatibility_count, len(similar_apps))))
