@@ -31,7 +31,7 @@ def get_features():
 
 
 class Command(BaseCommand):
-    help = 'Process similar csv'
+    help = 'Classify similarity of apps'
 
     def add_arguments(self, parser):
         parser.add_argument('--apps_count', type=int, default=-1,
@@ -48,26 +48,36 @@ class Command(BaseCommand):
                             help='Area of classification matrix. Default value is None')
 
     def handle(self, *args, **options):
-        apps_count, area, boundary, offset, persist, starting_at = self.get_arguments(options)
-
+        (
+            apps_count,
+            area,
+            boundary,
+            offset,
+            persist,
+            starting_at,
+        ) = self.get_arguments(options)
         if apps_count < 0:
             apps = App.objects.all()[starting_at:]
         else:
-            apps = App.objects.all()[starting_at:starting_at + apps_count]
-
-        classifier = AppClassifier(apps, features=get_features(),
-                                   boundary=boundary,
-                                   should_persist=persist,
-                                   offset=offset,
-                                   target_area=area)
+            apps = App.objects.all()[starting_at:starting_at
+                                                 + apps_count]
+        classifier = AppClassifier(
+            apps,
+            features=get_features(),
+            boundary=boundary,
+            should_persist=persist,
+            offset=offset,
+            target_area=area,
+        )
         similar_apps = classifier.find_similar_apps()
-
         if not persist:
             if similar_apps:
                 for app_tuple in similar_apps:
                     similar_apps = SimilarApp()
-                    similar_apps.source_package = app_tuple[0].package_name
-                    similar_apps.similar_package = app_tuple[1].package_name
+                    similar_apps.source_package = \
+                        app_tuple[0].package_name
+                    similar_apps.similar_package = \
+                        app_tuple[1].package_name
                     similar_apps.distance = app_tuple[2]
                     similar_apps.save()
 
