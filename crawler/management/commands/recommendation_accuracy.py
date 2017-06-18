@@ -8,6 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         result_dict = dict()
+        result_by_user_dict = dict()
         users = User.objects.all()
 
         for user in users:
@@ -25,9 +26,17 @@ class Command(BaseCommand):
                 result_count = result_dict[percentage]
 
             result_dict[percentage] = result_count + 1
+            result_by_user_dict[user.id] = (count, recommended_apps_count, percentage)
 
         admin_file = open('recommendation_accuracy', 'w')
         admin_file.write('Percentage of Recommended Installed;Instances Count\n')
         for key in result_dict:
             admin_file.write('{};{}\n'.format(key, result_dict[key]))
+        admin_file.close()
+
+        admin_file = open('recommendation_accuracy_by_user', 'w')
+        admin_file.write('User id;recommended_installed;recommended;ratio\n')
+        for key in result_by_user_dict:
+            data = result_by_user_dict[key]
+            admin_file.write('{};{};{};{}\n'.format(key, data[0], data[1], data[2]))
         admin_file.close()
