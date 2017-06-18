@@ -15,7 +15,7 @@ class Command(BaseCommand):
         result_dict = dict()
         similar_apps = self.get_my_similar()
         for similar_app in similar_apps:
-            app = App.objects.filter(package_name=similar_app)
+            app = App.objects.filter(package_name=similar_app).first()
             category = app.category_name()
             if category not in result_dict:
                 count = 0
