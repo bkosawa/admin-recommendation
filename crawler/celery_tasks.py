@@ -5,6 +5,21 @@ from crawler.models import App, UserApps, SimilarApp, User
 
 logger = get_task_logger('celery.tasks')
 
+built_in_apps = ['com.google.',
+                 'com.huawei.',
+                 'com.lenovo.',
+                 'com.lge',
+                 'com.miui.',
+                 'com.monotype.android.font.',
+                 'com.motorola.',
+                 'com.qualcomm.',
+                 'com.samsung.',
+                 'com.sec.',
+                 'com.sony.',
+                 'com.sonyericsson.',
+                 'com.sonymobile.',
+                 'com.xiaomi.']
+
 
 @app.task(name='recommend_to_user')
 def recommend_to_user(user_id):
@@ -16,7 +31,10 @@ def recommend_to_user(user_id):
 
     logger.info("User found: {}".format(user))
     logger.info("Finding user apps")
-    user_apps = UserApps.objects.filter(user=user).all()
+    queryset = UserApps.objects.filter(user=user)
+    for built_in_app in built_in_apps:
+        queryset = queryset.exclude(package_name__istartswith=built_in_app)
+    user_apps = queryset.all()
     apps = set()
     if not user_apps:
         logger.info("No user apps found")
