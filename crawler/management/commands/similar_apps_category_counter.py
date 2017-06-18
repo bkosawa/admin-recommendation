@@ -25,7 +25,7 @@ class Command(BaseCommand):
             result_dict[category] = count + 1
 
         admin_file = open('similar_apps_category.csv', 'w')
-        admin_file.write('category;count')
+        admin_file.write('category;count\n')
         for key in result_dict:
             admin_file.write('{};{}\n'.format(key, result_dict[key]))
         admin_file.close()
